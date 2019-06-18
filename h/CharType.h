@@ -8,19 +8,21 @@ class CharType{
         enum Types{
             SPACE,
             NEWLINE,
-            STRING,
-            COMMENT,
+			DELIMiTER,
+			GROUPER,
+            MARKER, //e.g. "" // /* */ in C++.
             OPERATOR,
             NUM,
             LETTER,
             ILLEGAL,
+			SPECIAL,
         };
 
         //Essentially the ASCII table here
         int mType[128];
         char mChar[128];
+		void setUp();
     public:
         CharType();
         int lookUp (int args, char* argv);
-        
 };
