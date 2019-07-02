@@ -1,5 +1,8 @@
 #include "../h/CharType.h"
 
+using std::string;
+//Different characters can have different meaning under different context.
+//Thus, in the parser, we need a way to tell the context. 
 CharType::CharType()
 {
 	//initialize matrices
@@ -7,6 +10,7 @@ CharType::CharType()
 	{
 		mType[i] = 0;
 	}
+	setUp();
 }
 
 void CharType::setUp() {
@@ -22,4 +26,32 @@ void CharType::setUp() {
 		97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,95 };
 	//const int SPECIAL; --> to be implemented. 
 	//const int ILLEGAL;
+
+	mType[SPACE_CHAR] = Types::SPACE;
+	mType[NEWLINE_CHAR] = Types::NEWLINE;
+	mType[DELIMITER_CHAR] = Types::DELIMITER;
+	
+	for (int i : MARKER_LIST) {
+		mType[i] = Types::MARKER;
+	}
+
+	for (int i : OPERATOR_LIST) {
+		mType[i] = Types::OPERATOR;
+	}
+
+	for (int i : GROUPER_LIST) {
+		mType[i] = Types::GROUPER;
+	}
+
+	for (int i : NUM_LIST) {
+		mType[i] = Types::NUM;
+	}
+
+	for (int i : LETTER_LIST) {
+		mType[i] = Types::LETTER;
+	}
+}
+
+int CharType::getCharType(char c) {
+	return mType[c];
 }

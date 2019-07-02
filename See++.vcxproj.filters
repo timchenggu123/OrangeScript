@@ -32,5 +32,11 @@
     <ClInclude Include="h\Lexer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="helper_h\Trie_node.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="helper_h\Trie.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

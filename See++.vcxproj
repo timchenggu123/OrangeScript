@@ -103,6 +103,8 @@
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="helper_h\Trie.h" />
+    <ClInclude Include="helper_h\Trie_node.h" />
     <ClInclude Include="h\CharType.h" />
     <ClInclude Include="h\Lexer.h" />
   </ItemGroup>
