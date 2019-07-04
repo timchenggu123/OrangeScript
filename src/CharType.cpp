@@ -30,7 +30,7 @@ void CharType::setUp() {
 	//const int ILLEGAL;
 
 	mType[SPACE_CHAR] = Types::SPACE;
-	mType[NEWLINE_CHAR] = Types::NEWLINE;
+	mType[NEWLINE_CHAR] = Types::NEW_LINE;
 	mType[DELIMITER_CHAR] = Types::DELIMITER;
 	mType[MARKER_1_CHAR] = Types::MARKER_1;
 	mType[MARKER_2_CHAR] = Types::MARKER_2;
@@ -44,7 +44,7 @@ void CharType::setUp() {
 	}
 
 	for (int i : GROUPER_2_LIST){
-		mType[i] = Types::GROUPER_2
+		mType[i] = Types::GROUPER_2;
 	}
 
 	for (int i : NUM_LIST) {

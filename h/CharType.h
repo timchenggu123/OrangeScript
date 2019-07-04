@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CHARTYPE_H
+#define CHARTYPE_H
 #include <string>
 
 using namespace std;
@@ -12,10 +13,10 @@ class CharType{
     public:
 		enum Types {
 			SPACE,
-			NEWLINE,
+			NEW_LINE,
 			DELIMITER,
 			GROUPER_1,
-			GROUPER_2
+			GROUPER_2,
 			MARKER_1, //e.g. "" // /* */ in C++.
 			MARKER_2,
 			OPERATOR,
@@ -23,9 +24,11 @@ class CharType{
 			LETTER,
 			ILLEGAL,
 			SPECIAL,
-			NULL
+			NULL_TYPE
 		};
 
         CharType();
         int getCharType (char c);
 };
+
+#endif

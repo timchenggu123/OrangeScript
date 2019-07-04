@@ -1,5 +1,5 @@
-#ifndef LEXER_h
-#define LEXER_h
+#ifndef LEXER_H
+#define LEXER_H
 
 #include "..\helper_h\Trie.h"
 #include "..\h\CharType.h"
@@ -17,20 +17,25 @@ private:
 	bool isWord(string buffer);
 	bool isNum(string buffer);
 	bool isKeyword(string buffer);
+	bool isOperator(string buffer);
+	bool isGrouper_1(string buffer);
+	bool isGrouper_2(string buffer);
 	void checkOut(list<pair<int, string>>* object, string buffer, int token);
 	CharType* charType;
 
 public:
 	enum Tokens {
+		NEW_LINE,
 		VARIABLE,
 		KEYWORD,
 		NUM_LITERAL,
 		STR_LITERAL,
 		OPERATOR,
-		GROUPER
+		GROUPER_1,
+		GROUPER_2
 	};
 	Lexer();
-	void start(ifstream InputFile);
+	list<pair<int, string>> run(string inputFile);
 
 };
 
