@@ -14,13 +14,16 @@ class CharType{
 			SPACE,
 			NEWLINE,
 			DELIMITER,
-			GROUPER,
-			MARKER, //e.g. "" // /* */ in C++.
+			GROUPER_1,
+			GROUPER_2
+			MARKER_1, //e.g. "" // /* */ in C++.
+			MARKER_2,
 			OPERATOR,
 			NUM,
 			LETTER,
 			ILLEGAL,
 			SPECIAL,
+			NULL
 		};
 
         CharType();

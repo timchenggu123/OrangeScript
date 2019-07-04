@@ -40,10 +40,39 @@ void Lexer::start(ifstream inputFile) {
 	char c;
 	string buffer = "";
 	list < pair <int, string> > *returnObject = new list < pair <int, string> >();
-
+	bool listening_string = false
+	int current_type = CharType::Types::NULL;
+	int previous_type = CharType::Types::NULL;
+	bool check_out = false;
 	while (inputFile >> c) {
+		current_type = charType->getCharType(c);
 
-		if (charType->getCharType(c) == CharType::Types::SPACE) {
+		if (current_type == CharType::Types::MARKER_1){
+			listening_string = true;
+			continue;
+		}
+		if (current_type== CharType::Types::MARKER_2){
+			listening_string = false;
+			checkOut(returnObject,buffer,Tokens::STR_LITERAL;)
+			continue;
+		}
+		if (!listening_string){
+			buffer += c;
+			continue;
+		}
+		
+		if (!previous_type == CharType::Types::NULL &&
+			!previous_type = current_type){
+			check_out = true;
+		}
+
+		if (check_out) {
+			check_out = false;
+
+			if (current_type == CharType::Types::SPACE){
+				previous_type = CharType::Types::NULL;
+			}
+			
 			if (isKeyword(buffer)) {
 				checkOut(returnObject, buffer, Tokens::KEYWORD);
 				buffer = "";
@@ -58,19 +87,9 @@ void Lexer::start(ifstream inputFile) {
 			}
 			continue;
 		}
-		else if (charType->getCharType(c) == CharType::Types::NUM) {
 
-		}
-		else if (charType->getCharType(c) == CharType::Types::LETTER) {
-
-		}
-		else if (charType->getCharType(c) == CharType::Types::GROUPER) {
-		
-		}
-		else if (charType->getCharType(c) == CharType::Types::DELIMITER) {
-		
-		}
-	
+		buffer += c;
+		previous_type = current_type;
 	}
 }
 
