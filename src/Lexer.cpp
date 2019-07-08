@@ -48,19 +48,15 @@ list<pair<int,string>> Lexer::run(string inputText) {
 	for (char c: inputText) {
 		/*This part of the code uses edge-triggered design to separate
 		input string into tokens.
-		
-		***Note that currently spaces, quotations,
-		and new line characters do not hold any literal meaning and therefore 
-		we must set previous_type to NULL_TYPE before we continue onto the 
-		next loop.
 		*/
+
 		current_type = charType->getCharType(c);
 
 		if (current_type == CharType::Types::MARKER_1){
 			if (listening_string) {
 				listening_string = false;
 				checkOut(&returnObject, buffer, Tokens::STR_LITERAL);
-				previous_type = CharType::Types::NULL_TYPE;
+				previous_type = current_type;
 				buffer = "";
 				continue;
 			}
@@ -72,7 +68,7 @@ list<pair<int,string>> Lexer::run(string inputText) {
 		if (current_type== CharType::Types::MARKER_2){
 			listening_string = false;
 			checkOut(&returnObject, buffer, Tokens::STR_LITERAL);
-			previous_type = CharType::Types::NULL_TYPE;
+			previous_type = current_type;
 			buffer = "";
 			continue;
 		}
@@ -81,7 +77,7 @@ list<pair<int,string>> Lexer::run(string inputText) {
 			continue;
 		}
 		
-		if (previous_type != CharType::Types::NULL_TYPE &&
+		if (charType->isNullChar(c) &&
 			previous_type != current_type){
 			check_out = true;
 		}
@@ -121,11 +117,8 @@ list<pair<int,string>> Lexer::run(string inputText) {
 
 		}
 
-		if (current_type == CharType::Types::SPACE) {
-			previous_type = CharType::Types::NULL_TYPE;
-		}
-		else if (current_type == CharType::Types::NEW_LINE) {
-			previous_type = CharType::Types::NULL_TYPE;
+		if (charType->isNullChar(c)) {
+			previous_type = current_type;
 		} else {
 			buffer += c;
 			previous_type = current_type;
