@@ -23,6 +23,10 @@ Lexer::Lexer() :
 	charType(new CharType())
 {
 	setUp();
+	//initialize vairables
+	currentLn = 1;
+	currentCol = 1;
+	currentId = 1;
 }
 
 void Lexer::setUp() {
@@ -49,6 +53,7 @@ list<pair<int,string>> Lexer::run(string inputText) {
 		/*This part of the code uses edge-triggered design to separate
 		input string into tokens.
 		*/
+		checkNewLine(c);
 
 		current_type = charType->getCharType(c);
 
@@ -227,7 +232,20 @@ bool Lexer::isGrouper_2(string buffer)
 	return true;
 }
 
-void Lexer::checkOut(list<pair<int,string>>* object, string buffer, int token) {
-	pair<int, string> item(token, buffer);
-	object->push_back(item);
+void Lexer::checkNewLine(char c){
+	if (c == 12){
+		currentLn++;
+	}
+}
+void Lexer::checkOut(list<Token>* object, string buffer, int type) {
+	Token token;
+	token.type = type;
+	token.text = buffer;
+	token.id = this.currentId;
+	token.ln = this.currentLn;
+	token.col = this.currentCol;
+	//increment id by one after checking out.
+	currentId++;
+
+	object->push_back(token);
 }

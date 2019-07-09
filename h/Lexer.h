@@ -12,6 +12,12 @@ using std::string;
 
 class Lexer {
 private:
+	//private variables:
+	int currentLn;
+	int currentCol;
+	int currentId;
+
+	//private methods:
 	Trie *syntaxTrie;
 	void setUp();
 	bool isWord(string buffer);
@@ -20,10 +26,19 @@ private:
 	bool isOperator(string buffer);
 	bool isGrouper_1(string buffer);
 	bool isGrouper_2(string buffer);
+	void checkNewLine(char c)
 	void checkOut(list<pair<int, string>>* object, string buffer, int token);
 	CharType* charType;
 
 public:
+	struct Token{
+		int type;
+		string text;
+		int ln;
+		int col;
+		int id;
+	}
+
 	enum Tokens {
 		NEW_LINE,
 		VARIABLE,
@@ -35,7 +50,7 @@ public:
 		GROUPER_2
 	};
 	Lexer();
-	list<pair<int, string>> run(string inputFile);
+	list<Token> run(string inputFile);
 
 };
 
