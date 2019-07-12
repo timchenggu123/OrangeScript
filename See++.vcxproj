@@ -100,15 +100,21 @@
   <ItemGroup>
     <ClCompile Include="helper_cpp\Trie.cpp" />
     <ClCompile Include="helper_cpp\Trie_node.cpp" />
+    <ClCompile Include="src\Ast.cpp" />
     <ClCompile Include="src\CharType.cpp" />
     <ClCompile Include="src\Lexer.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\OpType.cpp" />
+    <ClCompile Include="src\Parser.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="helper_h\Trie.h" />
-    <ClInclude Include="helper_h\Trie_node.h" />
-    <ClInclude Include="h\CharType.h" />
-    <ClInclude Include="h\Lexer.h" />
+    <ClInclude Include="src\Ast.h" />
+    <ClInclude Include="src\CharType.h" />
+    <ClInclude Include="src\Lexer.h" />
+    <ClInclude Include="src\OpType.h" />
+    <ClInclude Include="src\Parser.h" />
+    <ClInclude Include="src\Trie.h" />
+    <ClInclude Include="src\Trie_node.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

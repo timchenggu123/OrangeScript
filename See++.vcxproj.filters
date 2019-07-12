@@ -30,18 +30,36 @@
     <ClCompile Include="helper_cpp\Trie_node.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Parser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OpType.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Ast.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="h\CharType.h">
+    <ClInclude Include="src\CharType.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="h\Lexer.h">
+    <ClInclude Include="src\Lexer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="helper_h\Trie_node.h">
+    <ClInclude Include="src\OpType.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="helper_h\Trie.h">
+    <ClInclude Include="src\Parser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Trie.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Trie_node.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Ast.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

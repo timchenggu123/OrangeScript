@@ -36,7 +36,7 @@ int main (int argc, char *argv[]){
 
 	Lexer* lexer = new Lexer();
 
-	std::list < std::pair<int, string>> tokenList = lexer->run(inputText);
+	std::list <Lexer::Token> tokenList = lexer->run(inputText);
 	
 
 	system("pause");

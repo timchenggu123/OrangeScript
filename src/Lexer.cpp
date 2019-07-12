@@ -1,5 +1,5 @@
-#include "..\helper_h\Trie.h"
-#include "..\h\Lexer.h"
+#include "Trie.h"
+#include "Lexer.h"
 
 
 #include <fstream>
@@ -20,13 +20,12 @@ using std::cerr;
 
 Lexer::Lexer() :
 	syntaxTrie(new Trie()),
-	charType(new CharType())
+	charType(new CharType()),
+	currentLn(1),
+	currentCol(1),
+	currentId(1)
 {
 	setUp();
-	//initialize vairables
-	currentLn = 1;
-	currentCol = 1;
-	currentId = 1;
 }
 
 void Lexer::setUp() {
@@ -40,27 +39,33 @@ void Lexer::setUp() {
 	syntaxTrie->insert("else");
 }
 
-list<pair<int,string>> Lexer::run(string inputText) {
+list<Lexer::Token> Lexer::run(string inputText) {
 
 	char c;
 	string buffer = "";
-	list < pair <int, string> > returnObject = list < pair <int, string> >();
+	list <Token> returnObject = list <Token>();
 	bool listening_string = false;
-	int current_type = CharType::Types::NULL_TYPE;
-	int previous_type = CharType::Types::NULL_TYPE;
-	bool check_out = false;
+	int* current_type;
+	int* previous_type;
+	bool check_out = false;;
 	for (char c: inputText) {
 		/*This part of the code uses edge-triggered design to separate
 		input string into tokens.
 		*/
-		checkNewLine(c);
+		if (checkNewLine(c)) {
+			currentLn++;
+			buffer = "";
+			makeToken(&returnObject, buffer, Tokens::BREAK);
+			previous_type = current_type;
+			continue;
+		 }
 
 		current_type = charType->getCharType(c);
 
-		if (current_type == CharType::Types::MARKER_1){
+		if (charType->isEqual(current_type, CharType::MARKER_2)){
 			if (listening_string) {
 				listening_string = false;
-				checkOut(&returnObject, buffer, Tokens::STR_LITERAL);
+				makeToken(&returnObject, buffer, Tokens::STR_LITERAL);
 				previous_type = current_type;
 				buffer = "";
 				continue;
@@ -70,9 +75,9 @@ list<pair<int,string>> Lexer::run(string inputText) {
 				continue;
 			}
 		}
-		if (current_type== CharType::Types::MARKER_2){
+		if (charType->isEqual(current_type, CharType::MARKER_2)){
 			listening_string = false;
-			checkOut(&returnObject, buffer, Tokens::STR_LITERAL);
+			makeToken(&returnObject, buffer, Tokens::STR_LITERAL);
 			previous_type = current_type;
 			buffer = "";
 			continue;
@@ -82,8 +87,8 @@ list<pair<int,string>> Lexer::run(string inputText) {
 			continue;
 		}
 		
-		if (charType->isNullChar(c) &&
-			previous_type != current_type){
+		if (!(charType->isNullType(previous_type)) &&
+			!charType->isEqual(previous_type,current_type)){
 			check_out = true;
 		}
 
@@ -91,27 +96,27 @@ list<pair<int,string>> Lexer::run(string inputText) {
 			check_out = false;
 			
 			if (isKeyword(buffer)) {
-				checkOut(&returnObject, buffer, Tokens::KEYWORD);
+				makeToken(&returnObject, buffer, Tokens::KEYWORD);
 				buffer = "";
 			}
 			else if (isWord(buffer)) {
-				checkOut(&returnObject,buffer, Tokens::VARIABLE);
+				makeToken(&returnObject,buffer, Tokens::VARIABLE);
+				buffer = "";
+			}
+			else if (isOperator(buffer)) {
+				makeToken(&returnObject, buffer, Tokens::OPERATOR);
 				buffer = "";
 			}
 			else if (isNum(buffer)) {
-				checkOut(&returnObject, buffer, Tokens::NUM_LITERAL);
-				buffer = "";      
-			}
-			else if (isOperator(buffer)) {
-				checkOut(&returnObject, buffer, Tokens::OPERATOR);
+				makeToken(&returnObject, buffer, Tokens::NUM_LITERAL);
 				buffer = "";
 			}
-			else if (isGrouper_1(buffer)) {
-				checkOut(&returnObject, buffer, Tokens::GROUPER_1);
+			else if (isGrouper_1(buffer)) {	
+				makeToken(&returnObject, buffer, Tokens::GROUPER_1);
 				buffer = "";
 			}
 			else if (isGrouper_2(buffer)) {
-				checkOut(&returnObject, buffer, Tokens::GROUPER_2);
+				makeToken(&returnObject, buffer, Tokens::GROUPER_2);
 				buffer = "";
 			}
 			else if (buffer.length() != 0) {
@@ -122,7 +127,7 @@ list<pair<int,string>> Lexer::run(string inputText) {
 
 		}
 
-		if (charType->isNullChar(c)) {
+		if (charType->isNullType(current_type)) {
 			previous_type = current_type;
 		} else {
 			buffer += c;
@@ -140,7 +145,7 @@ bool Lexer::isWord(string buffer) {
 	}
 
 	for (char c : buffer) {
-		if (charType->getCharType(c) != CharType::Types::LETTER) {
+		if (!charType->isEqual(charType->getCharType(c), CharType::LETTER)) {
 			return false;
 		}
 	}
@@ -155,14 +160,14 @@ bool Lexer::isNum(string buffer) {
 	}
 	if (buffer[0] == (int) "-") {
 		for (char c : buffer.substr(1,buffer.length())) {
-			if (charType->getCharType(c) != CharType::Types::NUM) {
+			if (!charType->isEqual(charType->getCharType(c),CharType::NUM)) {
 				return false;
 			}
 		}
 	}
 	else {
 		for (char c : buffer) {
-			if (charType->getCharType(c) != CharType::Types::NUM) {
+			if (!charType->isEqual(charType->getCharType(c),CharType::NUM)) {
 				return false;
 			}
 		}
@@ -192,7 +197,7 @@ bool Lexer::isOperator(string buffer)
 	}
 
 	for (char c : buffer) {
-		if (charType->getCharType(c) != CharType::Types::OPERATOR) {
+		if (!charType->isEqual(charType->getCharType(c),CharType::OPERATOR)) {
 			return false;
 		}
 	}
@@ -208,7 +213,7 @@ bool Lexer::isGrouper_1(string buffer)
 	}
 
 	for (char c : buffer) {
-		if (charType->getCharType(c) != CharType::Types::GROUPER_1) {
+		if (!charType->isEqual(charType->getCharType(c), CharType::Types::GROUPER_1)) {
 			return false;
 		}
 	}
@@ -224,7 +229,7 @@ bool Lexer::isGrouper_2(string buffer)
 	}
 
 	for (char c : buffer) {
-		if (charType->getCharType(c) != CharType::Types::GROUPER_2) {
+		if (!charType->isEqual(charType->getCharType(c), CharType::Types::GROUPER_2)) {
 			return false;
 		}
 	}
@@ -232,18 +237,20 @@ bool Lexer::isGrouper_2(string buffer)
 	return true;
 }
 
-void Lexer::checkNewLine(char c){
+bool Lexer::checkNewLine(char c){
 	if (c == 12){
-		currentLn++;
+		return true;
 	}
+	return false;
 }
-void Lexer::checkOut(list<Token>* object, string buffer, int type) {
+
+void Lexer::makeToken(list<Token>* object, string buffer, int type) {
 	Token token;
 	token.type = type;
 	token.text = buffer;
-	token.id = this.currentId;
-	token.ln = this.currentLn;
-	token.col = this.currentCol;
+	token.id = currentId;
+	token.ln = currentLn;
+	token.col = currentCol;
 	//increment id by one after checking out.
 	currentId++;
 
