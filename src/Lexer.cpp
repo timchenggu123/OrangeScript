@@ -251,8 +251,10 @@ void Lexer::makeToken(list<Token>* object, string buffer, int type) {
 	token.id = currentId;
 	token.ln = currentLn;
 	token.col = currentCol;
+	token.next = nullptr;
 	//increment id by one after checking out.
 	currentId++;
-
+	object->back().next = &token;
+	token.prev = &object->back();
 	object->push_back(token);
 }

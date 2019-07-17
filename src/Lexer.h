@@ -18,6 +18,8 @@ public:
 		int ln;
 		int col;
 		int id;
+		Token* next;
+		Token* prev;
 	};
 
 	enum Tokens {
