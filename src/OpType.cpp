@@ -58,3 +58,39 @@ int OpType::getPrecedence(int opType)
 	return 0;
 }
 
+const int OpType::getOpType(string op)
+{
+	//TODO: complete mapping
+	if (op == "+") {
+		return ADD;
+	}
+	else if (op == "-") {
+		return SUB;
+	}
+	else if (op == "*") {
+		return MUL;
+	}
+	else if (op == "/") {
+		return DIV;
+	}
+	else if (op == "%") {
+		return MOD;
+	}
+	else if (op == " == ") {
+		return EQ;
+	}
+	else if (op == "&") {
+		return B_AND;
+	}
+	else if (op == "|") {
+		return B_OR;
+	}
+	else if (op == "&&") {
+		return L_AND;
+	}
+	else if (op == "||") {
+		return L_OR;
+	}
+	return 0;
+}
+

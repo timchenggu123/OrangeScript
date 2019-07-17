@@ -34,7 +34,7 @@ public:
 	OpType();
 	~OpType();
 	int getPrecedence(int opType);
-	int getOpType(string op);
+	const int getOpType(string op);
 };
 
 #endif
