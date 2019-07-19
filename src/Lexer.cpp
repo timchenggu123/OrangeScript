@@ -246,7 +246,12 @@ bool Lexer::checkNewLine(char c){
 
 void Lexer::makeToken(list<Token>* object, string buffer, int type) {
 	Token token;
-	token.type = type;
+	if (type == OPERATOR){
+		token.type = opType.getOpType(buffer);
+	}else{
+		token.type = type;
+	}
+
 	token.text = buffer;
 	token.id = currentId;
 	token.ln = currentLn;

@@ -3,6 +3,7 @@
 
 #include "Trie.h"
 #include "CharType.h"
+#include "OpType.h"
 #include <vector>
 #include <fstream>
 #include <list>
@@ -53,8 +54,9 @@ private:
 	bool isGrouper_2(string buffer);
 	bool checkNewLine(char c);
 	void makeToken(list<Token>* object, string buffer, int type);
-	CharType* charType;
 
+	CharType* charType;
+	OpType* opType;
 
 
 };
