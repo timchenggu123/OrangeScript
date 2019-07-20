@@ -14,6 +14,8 @@ private:
 public:
 
 	enum Type {
+		//not all types defined here are implemented 
+		//at the moment
 		NULL_TYPE,
 		FUN, MEM_ACC,
 		INC, DEC, B_NOT, L_NOT, INDIR, ADDRESS,
@@ -33,8 +35,9 @@ public:
 
 	OpType();
 	~OpType();
-	int getPrecedence(int opType);
-	const int getOpType(string op);
+	static const int getPrecedence(int opType);
+	static const int getOpType(string op);
+	static const bool isBinaryOp(int opType);
 };
 
 #endif

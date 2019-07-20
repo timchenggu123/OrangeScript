@@ -11,7 +11,7 @@ OpType::~OpType()
 {
 }
 
-int OpType::getPrecedence(int opType)
+const int OpType::getPrecedence(int opType)
 {
 	switch (opType) {
 		case FUN:
@@ -90,6 +90,30 @@ const int OpType::getOpType(string op)
 	}
 	else if (op == "||") {
 		return L_OR;
+	}
+	return 0;
+}
+
+const bool OpType::isBinaryOp(int opType)
+{
+	//TODO need to be expanded
+	switch (opType) {
+	case ADD:
+	case SUB:
+	case MUL:
+	case DIV:
+	case EQ:
+	case NOT_EQ:
+	case L_AND:
+	case L_OR:
+	case B_OR:
+	case B_AND:
+	case LT:
+	case GT:
+	case LTE:
+	case GTE:
+	case ASSIGN:
+		return true;
 	}
 	return 0;
 }

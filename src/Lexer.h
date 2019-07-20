@@ -35,7 +35,7 @@ public:
 		BREAK
 	};
 	Lexer();
-	list<Token> run(string inputFile);
+	vector<Token> run(string inputFile);
 
 private:
 	//private variables:
@@ -53,7 +53,7 @@ private:
 	bool isGrouper_1(string buffer);
 	bool isGrouper_2(string buffer);
 	bool checkNewLine(char c);
-	void makeToken(list<Token>* object, string buffer, int type);
+	void makeToken(vector<Token>* object, string buffer, int type);
 
 	CharType* charType;
 	OpType* opType;

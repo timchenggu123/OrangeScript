@@ -39,11 +39,11 @@ void Lexer::setUp() {
 	syntaxTrie->insert("else");
 }
 
-list<Lexer::Token> Lexer::run(string inputText) {
+vector<Lexer::Token> Lexer::run(string inputText) {
 
 	char c;
 	string buffer = "";
-	list <Token> returnObject = list <Token>();
+	vector <Token> returnObject;
 	bool listening_string = false;
 	int* current_type;
 	int* previous_type;
@@ -244,10 +244,10 @@ bool Lexer::checkNewLine(char c){
 	return false;
 }
 
-void Lexer::makeToken(list<Token>* object, string buffer, int type) {
+void Lexer::makeToken(vector<Token>* object, string buffer, int type) {
 	Token token;
 	if (type == OPERATOR){
-		token.type = opType.getOpType(buffer);
+		token.type = OpType::getOpType(buffer);
 	}else{
 		token.type = type;
 	}
