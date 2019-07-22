@@ -14,6 +14,11 @@ Ast::Exp * Ast::getRoot()
 	return root;
 }
 
+void Ast::setRoot(Exp * node)
+{
+	root = node;
+}
+
 Ast::Exp * Ast::makeIntegerExp(int i)
 {
 	Exp *e = new Exp;
@@ -96,5 +101,11 @@ Ast::Exp * Ast::makeCallExp(string name, list<Exp>* args)
 	e->int_attr = NULL;
 	e->arguments = args;
 	return e;
+}
+
+int Ast::getExpType(Lexer::Token * token)
+{
+	//TODO implementation required. 
+	return 0;
 }
 

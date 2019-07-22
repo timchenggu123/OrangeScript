@@ -12,9 +12,13 @@ public:
 
 	Ast::Exp * parseExpressions(Lexer::Token * root);
 
-	Ast::Exp * parseExpression(Lexer::Token * lhs, int precedence);
+	Ast* parseExpression(Lexer::Token* token, int startId, int endId);
 
-	Ast* run(list<Lexer::Token>* tokens)
+	Ast::Exp * parseLeft(Lexer::Token * token, int startId);
+
+	Ast::Exp * parseRight(Lexer::Token * token, int endId);
+
+	Ast* run(list<Lexer::Token>* tokens);
 
 private:
 	void setUp();	
