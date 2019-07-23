@@ -18,28 +18,36 @@ void Parser::setUp()
 {
 }
 
-void scan(vector<Lexer::Token> *tokens)
+void scan(vector<Lexer::Token> *tokens, Ast* ast)
 {	
 	if (tokens == nullptr) {
 		//TODO throw error
 		std::cerr << "error at parser schanner" << std::endl;
 		exit(1);
 	}
-	Lexer::Token *token = tokens->begin;
+	list<Exp*> args;
+	Ast::Exp* rootNode = Ast::makeCodeBlock(&args);
 	
+	Lexer::Token *token = tokens->begin;
 	int startId = 0;
 	int endId = 0;
 	while (token->next != nullptr) 
 	{
 		if (token->type == Lexer::BREAK) {
 			if (startId == endId) {
+				token = token->next;
 				continue;
 			}
-			parseExpression(token, startId, endId);
-			startId = 0;
-			endId = 0;
+			rootNode->arguments->push_back(parseExpression(token, startId, endId));
+			token = token->next;
+			startId = token.id;
+			endId = token.id;
+			continue;
 		}
+	 	token = token->next;
+		endId = token->id;
 	}
+	ast->setRoot(rootNode);
 }
 
 Ast* Parser::parseExpression(Lexer::Token* token, int startId, int endId) {
@@ -48,17 +56,13 @@ Ast* Parser::parseExpression(Lexer::Token* token, int startId, int endId) {
 	int base_precedence = 0;
 	int expType = 0;
 	Lexer::Token* pivot;
-	while (true) {
+	while (token->id != endId) {
 		token = token->prev;
 		if (OpType::isBinaryOp(token->type) &&
 			OpType::getPrecedence(token ->type) < min_precedence){
 			min_precedence = OpType::getPrecedence(token->type);
 			pivot = token;
 			expType = Ast::BINARY;
-		}
-
-		if (token->id == startId) {
-			break;
 		}
 	}
 	if (expType == 0) {
@@ -88,6 +92,8 @@ Ast::Exp* Parser::parseLeft(Lexer::Token* token, int startId) {
 		}
 
 		if (token->id == startId) {
+			//We do not put the condition in the while 
+			//statement because startId is incluisve.
 			break;
 		}
 	}
@@ -106,17 +112,13 @@ Ast::Exp* Parser::parseRight(Lexer::Token* token, int endId) {
 	int base_precedence = 0;
 	int expType = 0;
 	Lexer::Token* pivot;
-	while (true) {
+	while (token->id == endId) {
 		token = token->next;
 		if (OpType::isBinaryOp(token->type) &&
 			OpType::getPrecedence(token->type) < min_precedence) {
 			min_precedence = OpType::getPrecedence(token->type);
 			pivot = token;
 			expType = Ast::BINARY;
-		}
-
-		if (token->id == endId) {
-			break;
 		}
 	}
 	if (expType == 0) {

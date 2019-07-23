@@ -27,7 +27,7 @@ public:
 		Exp* right;
 		string str_attr;
 		int int_attr;
-		list<Exp>* arguments;
+		list<Exp*>* arguments;
 	};
 
 	static Exp* makeIntegerExp(int i);
@@ -35,7 +35,11 @@ public:
 	static Exp* makeVariableExp(string s);
 	static Exp* makeUnaryExp(int opType, Exp* l);
 	static Exp* makeBinaryExp(int opType, Exp* l, Exp* r);
-	static Exp* makeCallExp(string name, list<Exp>* args);
+	static Exp* makeCallExp(string name, list<Exp*>* args);
+	static Exp* makeCodeBlock(list<Exp*>* args);
+	static Exp* makeForLoop(Exp* control, list<Exp*>* args);
+	static Exp* makeIfConditional(Exp* condition, list<Exp*>* args);
+	static Exp* makeWhileCondition(Exp* condition, list<Exp*>* args);
 	static int getExpType(Lexer::Token* token);
 	//Exp* makeProjectionExp(list<Lexer::Token> tokens); //These are to be implemented in fur
 	//Exp* makeRecordExp(list<Lexer::Token> tokens);

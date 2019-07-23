@@ -103,6 +103,59 @@ Ast::Exp * Ast::makeCallExp(string name, list<Exp>* args)
 	return e;
 }
 
+Ast::Exp* Ast::makeCodeBlock(list<Exp*>* args){
+	Exp* e = new Exp;
+	e->expType = CODE_BLK;
+	e->opType = NULL;
+	e->parent = nullptr;
+	e->left = nullptr;
+	e->right = nullptr;
+	e->str_attr = name;
+	e->int_attr = NULL;
+	e->arguments = args;
+	return e;
+}
+
+Ast::Exp* Ast::makeForLoop(Exp*control,list<Exp*>* args){
+	Exp* e = new Exp;
+	e->expType = FOR;
+	e->opType = NULL;
+	e->parent = nullptr;
+	e->left = control;
+	e->right = nullptr;
+	e->str_attr = name;
+	e->int_attr = NULL;
+	e->arguments = args;
+	return e;
+}
+
+Ast::Exp* Ast::makeIfConditional(Exp*condition,list<Exp*>* args){
+	Exp* e = new Exp;
+	e->expType = IF;
+	e->opType = NULL;
+	e->parent = nullptr;
+	e->left = condition;
+	e->right = nullptr;
+	e->str_attr = name;
+	e->int_attr = NULL;
+	e->arguments = args;
+	return e;
+}
+
+Ast::Exp* Ast::makeWhileLoop(Exp*condition,list<Exp*>* args){
+	Exp* e = new Exp;
+	e->expType = WHILE;
+	e->opType = NULL;
+	e->parent = nullptr;
+	e->left = condition;
+	e->right = nullptr;
+	e->str_attr = name;
+	e->int_attr = NULL;
+	e->arguments = args;
+	return e;
+}
+
+Ast::Exp* Ast::make
 int Ast::getExpType(Lexer::Token * token)
 {
 	//TODO implementation required. 
