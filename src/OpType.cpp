@@ -11,7 +11,7 @@ OpType::~OpType()
 {
 }
 
-const int OpType::getPrecedence(int opType)
+ int OpType::getPrecedence(int opType)
 {
 	switch (opType) {
 		case FUN:
@@ -58,7 +58,7 @@ const int OpType::getPrecedence(int opType)
 	return 0;
 }
 
-const int OpType::getOpType(string op)
+ int OpType::getOpType(string op)
 {
 	//TODO: complete mapping
 	if (op == "+") {
@@ -94,7 +94,7 @@ const int OpType::getOpType(string op)
 	return 0;
 }
 
-const bool OpType::isBinaryOp(int opType)
+ bool OpType::isBinaryOp(int opType)
 {
 	//TODO need to be expanded
 	switch (opType) {
@@ -119,7 +119,7 @@ const bool OpType::isBinaryOp(int opType)
 	return 0;
 }
 
-const bool OpType::isUnaryOp(int opType)
+ bool OpType::isUnaryOp(int opType)
 {
 	switch (opType){
 	case B_NOT:

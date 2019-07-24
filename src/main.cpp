@@ -38,11 +38,11 @@ int main (int argc, char *argv[]){
 
 	Lexer* lexer = new Lexer();
 
-	std::list <Lexer::Token> tokenList = lexer->run(inputText);
+	std::list <Lexer::Token*>* tokenList = lexer->run(inputText);
 	
 	Ast* ast = new Ast();
 	Parser* parser = new Parser();
-	parser->scan(&tokenList, ast);
+	parser->scan(tokenList, ast);
 
 	system("pause");
     return 0;

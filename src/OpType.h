@@ -35,10 +35,10 @@ public:
 
 	OpType();
 	~OpType();
-	static const int getPrecedence(int opType);
-	static const int getOpType(string op);
-	static const bool isBinaryOp(int opType);
-	static const bool isUnaryOp(int opType);
+	static  int getPrecedence(int opType);
+	static  int getOpType(string op);
+	static  bool isBinaryOp(int opType);
+	static  bool isUnaryOp(int opType);
 };
 
 #endif

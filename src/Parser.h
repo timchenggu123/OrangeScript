@@ -18,7 +18,7 @@ public:
 
 	Ast::Exp* parsePrimaryExpression(Lexer::Token* token);
 
-	void scan(list<Lexer::Token> *tokens, Ast* ast);
+	void scan(list<Lexer::Token*> *tokens, Ast* ast);
 
 };
 

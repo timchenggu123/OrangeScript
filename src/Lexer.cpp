@@ -39,14 +39,15 @@ void Lexer::setUp() {
 	syntaxTrie->insert("else");
 }
 
-list<Lexer::Token> Lexer::run(string inputText) {
+list<Lexer::Token*>* Lexer::run(string inputText) {
 
 	string buffer = "";
-	list <Token> returnObject;
+	list <Token*>* returnObject = new list<Token*>;
 	bool listening_string = false;
 	int* current_type = new int[5]{ 0,0,0,0,0 };
 	int* previous_type = new int[5]{ 0,0,0,0,0 };
 	bool check_out = false;;
+	bool multiple_lines = false;
 	for (char c: inputText) {
 		/*This part of the code uses edge-triggered design to separate
 		input string into tokens.
@@ -54,7 +55,8 @@ list<Lexer::Token> Lexer::run(string inputText) {
 		if (checkNewLine(c)) {
 			currentLn++;
 			buffer = "";
-			makeToken(&returnObject, buffer, Tokens::BREAK);
+			multiple_lines = true; //This flag checks if there is more than one line of code exist.
+			makeToken(returnObject, buffer, Tokens::BREAK);
 			charType->isEqual(previous_type,current_type);
 			continue;
 		 }
@@ -64,7 +66,7 @@ list<Lexer::Token> Lexer::run(string inputText) {
 		if (charType->isEqual(current_type, CharType::MARKER_2)){
 			if (listening_string) {
 				listening_string = false;
-				makeToken(&returnObject, buffer, Tokens::STR_LITERAL);
+				makeToken(returnObject, buffer, Tokens::STR_LITERAL);
 				charType->isEqual(previous_type,current_type);
 				buffer = "";
 				continue;
@@ -76,7 +78,7 @@ list<Lexer::Token> Lexer::run(string inputText) {
 		}
 		if (charType->isEqual(current_type, CharType::MARKER_2)){
 			listening_string = false;
-			makeToken(&returnObject, buffer, Tokens::STR_LITERAL);
+			makeToken(returnObject, buffer, Tokens::STR_LITERAL);
 			charType->isEqual(previous_type,current_type);
 			buffer = "";
 			continue;
@@ -95,27 +97,27 @@ list<Lexer::Token> Lexer::run(string inputText) {
 			check_out = false;
 			
 			if (isKeyword(buffer)) {
-				makeToken(&returnObject, buffer, Tokens::KEYWORD);
+				makeToken(returnObject, buffer, Tokens::KEYWORD);
 				buffer = "";
 			}
 			else if (isWord(buffer)) {
-				makeToken(&returnObject,buffer, Tokens::VARIABLE);
+				makeToken(returnObject, buffer, Tokens::VARIABLE);
 				buffer = "";
 			}
 			else if (isOperator(buffer)) {
-				makeToken(&returnObject, buffer, Tokens::OPERATOR);
+				makeToken(returnObject, buffer, Tokens::OPERATOR);
 				buffer = "";
 			}
 			else if (isNum(buffer)) {
-				makeToken(&returnObject, buffer, Tokens::NUM_LITERAL);
+				makeToken(returnObject, buffer, Tokens::NUM_LITERAL);
 				buffer = "";
 			}
-			else if (isGrouper_1(buffer)) {	
-				makeToken(&returnObject, buffer, Tokens::GROUPER_1);
+			else if (isGrouper_1(buffer)) {
+				makeToken(returnObject, buffer, Tokens::GROUPER_1);
 				buffer = "";
 			}
 			else if (isGrouper_2(buffer)) {
-				makeToken(&returnObject, buffer, Tokens::GROUPER_2);
+				makeToken(returnObject, buffer, Tokens::GROUPER_2);
 				buffer = "";
 			}
 			else if (buffer.length() != 0) {
@@ -133,6 +135,11 @@ list<Lexer::Token> Lexer::run(string inputText) {
 			previous_type = current_type;
 		}
 	}
+
+	if (!multiple_lines) {
+		makeToken(returnObject, buffer, Tokens::BREAK);
+	}
+
 	return returnObject;
 }
 
@@ -243,7 +250,9 @@ bool Lexer::checkNewLine(char c){
 	return false;
 }
 
-void Lexer::makeToken(list<Token>* object, string buffer, int type) {
+
+
+void Lexer::makeToken(list<Token*>* object, string buffer, int type) {
 	Token* token = new Token;
 	token->type = type;
 	if (type == OPERATOR) {
@@ -262,13 +271,13 @@ void Lexer::makeToken(list<Token>* object, string buffer, int type) {
 	currentId++;
 
 	if (object->size() != 0) {
-		token->prev = &(object->back());
+		token->prev = object->back();
 		token->prev->next = token;
-		object->push_back(*token);
+		object->push_back(token);
 	}
 	else {
 		token->prev = nullptr;
-		object->push_back(*token);
+		object->push_back(token);
 	}
 
 }

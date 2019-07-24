@@ -14,7 +14,7 @@ Parser::~Parser()
 }
 
 
-void Parser::scan(list<Lexer::Token> *tokens, Ast* ast)
+void Parser::scan(list<Lexer::Token*> *tokens, Ast* ast)
 {	
 	if (tokens == nullptr) {
 		//TODO throw error
@@ -24,38 +24,40 @@ void Parser::scan(list<Lexer::Token> *tokens, Ast* ast)
 	list<Ast::Exp*> args;
 	Ast::Exp* rootNode = Ast::makeCodeBlock(&args);
 	
-	Lexer::Token *token = &tokens->front();
+	Lexer::Token *token = tokens->front();
 	int startId = 0;
 	int endId = 0;
-	while (token->next != nullptr) 
+	while (token != nullptr) 
 	{
-		if (token->opType == Lexer::BREAK) {
+		endId = token->id;
+
+		if (token->type == Lexer::BREAK) {
 			if (startId == endId) {
 				token = token->next;
 				continue;
 			}
 			rootNode->arguments->push_back(parseExpression(token, startId, endId));
-			token = token->next;
 			startId = token->id;
-			endId = token->id;
+			token = token->next;
 			continue;
+
 		}
 	 	token = token->next;
-		endId = token->id;
 	}
 	ast->setRoot(rootNode);
 }
 
 Ast::Exp* Parser::parseExpression(Lexer::Token* token, int startId, int endId) {
-	int min_precedence = INFINITY;
+	int min_precedence = 0; //using a large number right now...could try infinity
 	int base_precedence = 0;
 	int expType = 0;
 	Lexer::Token* pivot;
-	while (token->id != endId) {
+	while (token ->prev != nullptr &&
+		token->prev->id != startId) {
 		token = token->prev;
 		if (token->type == Lexer::OPERATOR) {
 			if (OpType::isBinaryOp(token->opType) &&
-				OpType::getPrecedence(token->opType) < min_precedence) {
+				OpType::getPrecedence(token->opType) > min_precedence) {
 				min_precedence = OpType::getPrecedence(token->opType);
 				pivot = token;
 				expType = Ast::BINARY;
@@ -78,7 +80,7 @@ Ast::Exp* Parser::parseExpression(Lexer::Token* token, int startId, int endId) {
 }
 
 Ast::Exp* Parser::parseLeft(Lexer::Token* token, int startId) {
-	int min_precedence = INFINITY;
+	int min_precedence = 0;
 	int endId = token->id;
 	int base_precedence = 0;
 	int expType = 0;
@@ -88,11 +90,12 @@ Ast::Exp* Parser::parseLeft(Lexer::Token* token, int startId) {
 		return parsePrimaryExpression(token);
 	}
 
-	while (true) {
+	while (token->prev != nullptr &&
+		token->prev->id != startId) {
 		token = token->prev;
 		if (token->type == Lexer::OPERATOR) {
 			if (OpType::isBinaryOp(token->opType) &&
-				OpType::getPrecedence(token->opType) < min_precedence) {
+				OpType::getPrecedence(token->opType) > min_precedence) {
 				min_precedence = OpType::getPrecedence(token->opType);
 				pivot = token;
 				expType = Ast::BINARY;
@@ -100,12 +103,6 @@ Ast::Exp* Parser::parseLeft(Lexer::Token* token, int startId) {
 		}
 		else {
 			continue;
-		}
-
-		if (token->id == startId) {
-			//We do not put the condition in the while 
-			//statement because startId is incluisve.
-			break;
 		}
 	}
 	if (expType == 0) {
@@ -118,16 +115,17 @@ Ast::Exp* Parser::parseLeft(Lexer::Token* token, int startId) {
 }
 
 Ast::Exp* Parser::parseRight(Lexer::Token* token, int endId) {
-	int min_precedence = INFINITY;
+	int min_precedence = 0;
 	int startId = token->id;
 	int base_precedence = 0;
 	int expType = 0;
 	Lexer::Token* pivot;
-	while (token->id == endId) {
+	while (token->prev != nullptr &&
+		token->next->id != endId) {
 		token = token->next;
 		if (token->type == Lexer::OPERATOR) {
 			if (OpType::isBinaryOp(token->opType) &&
-				OpType::getPrecedence(token->opType) < min_precedence) {
+				OpType::getPrecedence(token->opType) > min_precedence) {
 				min_precedence = OpType::getPrecedence(token->opType);
 				pivot = token;
 				expType = Ast::BINARY;
