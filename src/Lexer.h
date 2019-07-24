@@ -15,6 +15,7 @@ class Lexer {
 public:
 	struct Token {
 		int type;
+		int opType;
 		string text;
 		int ln;
 		int col;
@@ -35,7 +36,7 @@ public:
 		BREAK
 	};
 	Lexer();
-	vector<Token> run(string inputFile);
+	list<Token> run(string inputFile);
 
 private:
 	//private variables:
@@ -53,11 +54,12 @@ private:
 	bool isGrouper_1(string buffer);
 	bool isGrouper_2(string buffer);
 	bool checkNewLine(char c);
-	void makeToken(vector<Token>* object, string buffer, int type);
+	void makeToken(list<Token>* object, string buffer, int type);
 
 	CharType* charType;
 	OpType* opType;
 
+	//temp variabels for make token
 
 };
 

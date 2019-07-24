@@ -38,6 +38,7 @@ public:
 	static const int getPrecedence(int opType);
 	static const int getOpType(string op);
 	static const bool isBinaryOp(int opType);
+	static const bool isUnaryOp(int opType);
 };
 
 #endif

@@ -10,19 +10,16 @@ public:
 	Parser();
 	~Parser();
 
-	Ast::Exp * parseExpressions(Lexer::Token * root);
-
-	Ast* parseExpression(Lexer::Token* token, int startId, int endId);
+	Ast::Exp* parseExpression(Lexer::Token* token, int startId, int endId);
 
 	Ast::Exp * parseLeft(Lexer::Token * token, int startId);
 
 	Ast::Exp * parseRight(Lexer::Token * token, int endId);
 
-	Ast* run(list<Lexer::Token>* tokens);
+	Ast::Exp* parsePrimaryExpression(Lexer::Token* token);
 
-private:
-	void setUp();	
-	OpType* opType;
+	void scan(list<Lexer::Token> *tokens, Ast* ast);
+
 };
 
 #endif

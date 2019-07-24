@@ -11,11 +11,16 @@ class Ast
 public:
 	enum ExpType {
 		INTEGER,
+		Decimal,
 		STRING,
 		VARIABLE,
 		UNARY,
 		BINARY,
 		CALL,
+		CODE_BLK,
+		FOR,
+		WHILE,
+		IF,
 		PROJECTION,
 		RECORD
 	};
@@ -31,6 +36,7 @@ public:
 	};
 
 	static Exp* makeIntegerExp(int i);
+	static Exp* makeDecimalExp(double d);
 	static Exp* makeStringExp(string s);
 	static Exp* makeVariableExp(string s);
 	static Exp* makeUnaryExp(int opType, Exp* l);
@@ -39,8 +45,8 @@ public:
 	static Exp* makeCodeBlock(list<Exp*>* args);
 	static Exp* makeForLoop(Exp* control, list<Exp*>* args);
 	static Exp* makeIfConditional(Exp* condition, list<Exp*>* args);
-	static Exp* makeWhileCondition(Exp* condition, list<Exp*>* args);
-	static int getExpType(Lexer::Token* token);
+	static Exp* makeWhileLoop(Exp* condition, list<Exp*>* args);
+
 	//Exp* makeProjectionExp(list<Lexer::Token> tokens); //These are to be implemented in fur
 	//Exp* makeRecordExp(list<Lexer::Token> tokens);
 	Ast();

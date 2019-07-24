@@ -6,7 +6,6 @@ using namespace std;
 
 class CharType{
     private:
-
         //Essentially the ASCII table here
         int* mType[128];
 		void setUp();
@@ -45,6 +44,7 @@ class CharType{
 		};
 
         CharType();
+		~CharType();
         int* getCharType (char c);
 		bool isNullType(int* type);
 		bool isEqual(int* type_1, int* type_2);

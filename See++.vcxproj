@@ -98,14 +98,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="helper_cpp\Trie.cpp" />
-    <ClCompile Include="helper_cpp\Trie_node.cpp" />
     <ClCompile Include="src\Ast.cpp" />
     <ClCompile Include="src\CharType.cpp" />
     <ClCompile Include="src\Lexer.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\OpType.cpp" />
     <ClCompile Include="src\Parser.cpp" />
+    <ClCompile Include="src\Trie.cpp" />
+    <ClCompile Include="src\Trie_node.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Ast.h" />

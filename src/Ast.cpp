@@ -33,6 +33,21 @@ Ast::Exp * Ast::makeIntegerExp(int i)
 	return e;
 }
 
+Ast::Exp * Ast::makeDecimalExp(double d)
+{
+	//TODO: add decimal attr
+	Exp *e = new Exp;
+	e->expType = INTEGER;
+	e->opType = NULL;
+	e->parent = nullptr;
+	e->left = nullptr;
+	e->right = nullptr;
+	e->str_attr = "";
+	e->int_attr = NULL;
+	e->arguments = nullptr;
+	return e;
+}
+
 Ast::Exp * Ast::makeStringExp(string s)
 {
 	Exp *e = new Exp;
@@ -89,7 +104,7 @@ Ast::Exp * Ast::makeBinaryExp(int opType, Exp * l, Exp * r)
 	return e;
 }
 
-Ast::Exp * Ast::makeCallExp(string name, list<Exp>* args)
+Ast::Exp * Ast::makeCallExp(string name, list<Exp*>* args)
 {
 	Exp *e = new Exp;
 	e->expType = CALL;
@@ -110,7 +125,7 @@ Ast::Exp* Ast::makeCodeBlock(list<Exp*>* args){
 	e->parent = nullptr;
 	e->left = nullptr;
 	e->right = nullptr;
-	e->str_attr = name;
+	e->str_attr = "";
 	e->int_attr = NULL;
 	e->arguments = args;
 	return e;
@@ -123,7 +138,7 @@ Ast::Exp* Ast::makeForLoop(Exp*control,list<Exp*>* args){
 	e->parent = nullptr;
 	e->left = control;
 	e->right = nullptr;
-	e->str_attr = name;
+	e->str_attr = "";
 	e->int_attr = NULL;
 	e->arguments = args;
 	return e;
@@ -136,7 +151,7 @@ Ast::Exp* Ast::makeIfConditional(Exp*condition,list<Exp*>* args){
 	e->parent = nullptr;
 	e->left = condition;
 	e->right = nullptr;
-	e->str_attr = name;
+	e->str_attr = "";
 	e->int_attr = NULL;
 	e->arguments = args;
 	return e;
@@ -149,16 +164,10 @@ Ast::Exp* Ast::makeWhileLoop(Exp*condition,list<Exp*>* args){
 	e->parent = nullptr;
 	e->left = condition;
 	e->right = nullptr;
-	e->str_attr = name;
+	e->str_attr = "";
 	e->int_attr = NULL;
 	e->arguments = args;
 	return e;
 }
 
-Ast::Exp* Ast::make
-int Ast::getExpType(Lexer::Token * token)
-{
-	//TODO implementation required. 
-	return 0;
-}
 

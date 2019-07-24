@@ -1,47 +1,43 @@
 #include <iostream>
+#include <sstream>
 #include "OpType.h"
 #include "Parser.h"
 #include "Lexer.h"
 #include "Ast.h"
 
-Parser::Parser():
-	opType(new OpType)
+Parser::Parser()
 {
 }
 
 Parser::~Parser()
 {
-	delete opType;
 }
 
-void Parser::setUp()
-{
-}
 
-void scan(vector<Lexer::Token> *tokens, Ast* ast)
+void Parser::scan(list<Lexer::Token> *tokens, Ast* ast)
 {	
 	if (tokens == nullptr) {
 		//TODO throw error
 		std::cerr << "error at parser schanner" << std::endl;
 		exit(1);
 	}
-	list<Exp*> args;
+	list<Ast::Exp*> args;
 	Ast::Exp* rootNode = Ast::makeCodeBlock(&args);
 	
-	Lexer::Token *token = tokens->begin;
+	Lexer::Token *token = &tokens->front();
 	int startId = 0;
 	int endId = 0;
 	while (token->next != nullptr) 
 	{
-		if (token->type == Lexer::BREAK) {
+		if (token->opType == Lexer::BREAK) {
 			if (startId == endId) {
 				token = token->next;
 				continue;
 			}
 			rootNode->arguments->push_back(parseExpression(token, startId, endId));
 			token = token->next;
-			startId = token.id;
-			endId = token.id;
+			startId = token->id;
+			endId = token->id;
 			continue;
 		}
 	 	token = token->next;
@@ -50,30 +46,35 @@ void scan(vector<Lexer::Token> *tokens, Ast* ast)
 	ast->setRoot(rootNode);
 }
 
-Ast* Parser::parseExpression(Lexer::Token* token, int startId, int endId) {
-	Ast* ast = new Ast();
+Ast::Exp* Parser::parseExpression(Lexer::Token* token, int startId, int endId) {
 	int min_precedence = INFINITY;
 	int base_precedence = 0;
 	int expType = 0;
 	Lexer::Token* pivot;
 	while (token->id != endId) {
 		token = token->prev;
-		if (OpType::isBinaryOp(token->type) &&
-			OpType::getPrecedence(token ->type) < min_precedence){
-			min_precedence = OpType::getPrecedence(token->type);
-			pivot = token;
-			expType = Ast::BINARY;
+		if (token->type == Lexer::OPERATOR) {
+			if (OpType::isBinaryOp(token->opType) &&
+				OpType::getPrecedence(token->opType) < min_precedence) {
+				min_precedence = OpType::getPrecedence(token->opType);
+				pivot = token;
+				expType = Ast::BINARY;
+			}
 		}
+		else {
+			continue;
+		}
+
 	}
 	if (expType == 0) {
-		//Expected an expression; throw an error here.
+		std::cerr << "expected expression at ln:" << token->ln << " col " << token->col;
 	}
 	if (expType == Ast::BINARY) {
-		ast->setRoot(Ast::makeBinaryExp(pivot->type,
-			parseLeft(pivot, startId), parseRight(pivot, endId);
+			return Ast::makeBinaryExp(
+				pivot->type,parseLeft(pivot, startId), parseRight(pivot, endId));
 	}
 	//parse unary expression
-	return ast;
+	return nullptr;
 }
 
 Ast::Exp* Parser::parseLeft(Lexer::Token* token, int startId) {
@@ -82,13 +83,23 @@ Ast::Exp* Parser::parseLeft(Lexer::Token* token, int startId) {
 	int base_precedence = 0;
 	int expType = 0;
 	Lexer::Token* pivot;
+
+	if (token->id - startId == 1) {
+		return parsePrimaryExpression(token);
+	}
+
 	while (true) {
 		token = token->prev;
-		if (OpType::isBinaryOp(token->type) &&
-			OpType::getPrecedence(token->type) < min_precedence) {
-			min_precedence = OpType::getPrecedence(token->type);
-			pivot = token;
-			expType = Ast::BINARY;
+		if (token->type == Lexer::OPERATOR) {
+			if (OpType::isBinaryOp(token->opType) &&
+				OpType::getPrecedence(token->opType) < min_precedence) {
+				min_precedence = OpType::getPrecedence(token->opType);
+				pivot = token;
+				expType = Ast::BINARY;
+			}
+		}
+		else {
+			continue;
 		}
 
 		if (token->id == startId) {
@@ -114,11 +125,13 @@ Ast::Exp* Parser::parseRight(Lexer::Token* token, int endId) {
 	Lexer::Token* pivot;
 	while (token->id == endId) {
 		token = token->next;
-		if (OpType::isBinaryOp(token->type) &&
-			OpType::getPrecedence(token->type) < min_precedence) {
-			min_precedence = OpType::getPrecedence(token->type);
-			pivot = token;
-			expType = Ast::BINARY;
+		if (token->type == Lexer::OPERATOR) {
+			if (OpType::isBinaryOp(token->opType) &&
+				OpType::getPrecedence(token->opType) < min_precedence) {
+				min_precedence = OpType::getPrecedence(token->opType);
+				pivot = token;
+				expType = Ast::BINARY;
+			}
 		}
 	}
 	if (expType == 0) {
@@ -131,15 +144,23 @@ Ast::Exp* Parser::parseRight(Lexer::Token* token, int endId) {
 
 }
 
-Ast* Parser::Parser(list<Lexer::Token> tokens) {
-	//check type of statement
-	//make statement
-
-	//process expressions --use operator precedence parsing https://en.wikipedia.org/wiki/Operator-precedence_parser
-
-
-	//if to see if properly terminated
+Ast::Exp* Parser::parsePrimaryExpression(Lexer::Token* token) {
+	if (token->type == Lexer::NUM_LITERAL) {
+		for (char c : token->text) {
+			if (c == '.') {
+				return Ast::makeDecimalExp(3.13);
+			}
+		}
+	}
+	else {
+		std::stringstream ss(token->text);
+		int num = 0;
+		ss >> num;
+		return Ast::makeIntegerExp(num);
+	}
+	//TODO: need to expand
 }
+
 
 
 /*

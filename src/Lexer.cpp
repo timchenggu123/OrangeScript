@@ -39,14 +39,13 @@ void Lexer::setUp() {
 	syntaxTrie->insert("else");
 }
 
-vector<Lexer::Token> Lexer::run(string inputText) {
+list<Lexer::Token> Lexer::run(string inputText) {
 
-	char c;
 	string buffer = "";
-	vector <Token> returnObject;
+	list <Token> returnObject;
 	bool listening_string = false;
-	int* current_type;
-	int* previous_type;
+	int* current_type = new int[5]{ 0,0,0,0,0 };
+	int* previous_type = new int[5]{ 0,0,0,0,0 };
 	bool check_out = false;;
 	for (char c: inputText) {
 		/*This part of the code uses edge-triggered design to separate
@@ -56,7 +55,7 @@ vector<Lexer::Token> Lexer::run(string inputText) {
 			currentLn++;
 			buffer = "";
 			makeToken(&returnObject, buffer, Tokens::BREAK);
-			previous_type = current_type;
+			charType->isEqual(previous_type,current_type);
 			continue;
 		 }
 
@@ -66,7 +65,7 @@ vector<Lexer::Token> Lexer::run(string inputText) {
 			if (listening_string) {
 				listening_string = false;
 				makeToken(&returnObject, buffer, Tokens::STR_LITERAL);
-				previous_type = current_type;
+				charType->isEqual(previous_type,current_type);
 				buffer = "";
 				continue;
 			}
@@ -78,7 +77,7 @@ vector<Lexer::Token> Lexer::run(string inputText) {
 		if (charType->isEqual(current_type, CharType::MARKER_2)){
 			listening_string = false;
 			makeToken(&returnObject, buffer, Tokens::STR_LITERAL);
-			previous_type = current_type;
+			charType->isEqual(previous_type,current_type);
 			buffer = "";
 			continue;
 		}
@@ -244,22 +243,32 @@ bool Lexer::checkNewLine(char c){
 	return false;
 }
 
-void Lexer::makeToken(vector<Token>* object, string buffer, int type) {
-	Token token;
-	if (type == OPERATOR){
-		token.type = OpType::getOpType(buffer);
-	}else{
-		token.type = type;
+void Lexer::makeToken(list<Token>* object, string buffer, int type) {
+	Token* token = new Token;
+	token->type = type;
+	if (type == OPERATOR) {
+		token->opType = OpType::getOpType(buffer);
 	}
+	else {
+		token->opType = -1;
+	}
+	token->text = buffer;
+	token->id = currentId;
+	token->ln = currentLn;
+	token->col = currentCol;
+	token->next = 0;
 
-	token.text = buffer;
-	token.id = currentId;
-	token.ln = currentLn;
-	token.col = currentCol;
-	token.next = nullptr;
 	//increment id by one after checking out.
 	currentId++;
-	object->back().next = &token;
-	token.prev = &object->back();
-	object->push_back(token);
+
+	if (object->size() != 0) {
+		token->prev = &(object->back());
+		token->prev->next = token;
+		object->push_back(*token);
+	}
+	else {
+		token->prev = nullptr;
+		object->push_back(*token);
+	}
+
 }

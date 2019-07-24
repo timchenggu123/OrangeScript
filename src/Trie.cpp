@@ -1,5 +1,5 @@
 #include <stdexcept>
-#include "..\helper_h\Trie.h"
+#include "Trie.h"
 #include <iostream>
 #include <string>
 #include <cctype>

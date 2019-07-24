@@ -3,7 +3,9 @@
 #include <utility>
 #include <list>
 #include <sstream>
-#include "..\h\Lexer.h"
+#include "Lexer.h"
+#include "Ast.h"
+#include "Parser.h"
 
 using std::string;
 using std::cout;
@@ -38,6 +40,9 @@ int main (int argc, char *argv[]){
 
 	std::list <Lexer::Token> tokenList = lexer->run(inputText);
 	
+	Ast* ast = new Ast();
+	Parser* parser = new Parser();
+	parser->scan(&tokenList, ast);
 
 	system("pause");
     return 0;

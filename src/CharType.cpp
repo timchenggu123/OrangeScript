@@ -8,13 +8,19 @@ CharType::CharType()
 	//initialize matrices
 	for (int i = 0; i < 128; i++)
 	{
-		int m[5];
-		mType[i] = m;
+		mType[i] = new int[5];
 		for (int j = 0; j < 5; j++) {
-			mType[i][j] == 0;
+			mType[i][j] = 0;
 		}
 	}
 	setUp();
+}
+
+CharType::~CharType() {
+	for (int i = 0; i < 128; i++) {
+		delete[] mType[i];
+	}
+	delete[] mType;
 }
 
 void CharType::setUp() {

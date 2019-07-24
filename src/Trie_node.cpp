@@ -1,6 +1,6 @@
 #include <string>
 #include <cctype>
-#include "..\helper_h\Trie_node.h"
+#include "Trie_node.h"
 
 Trie_node::Trie_node() : children(nullptr),
 is_terminal(false)

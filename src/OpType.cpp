@@ -94,7 +94,7 @@ const int OpType::getOpType(string op)
 	return 0;
 }
 
-static const bool OpType::isBinaryOp(int opType)
+const bool OpType::isBinaryOp(int opType)
 {
 	//TODO need to be expanded
 	switch (opType) {
@@ -119,13 +119,13 @@ static const bool OpType::isBinaryOp(int opType)
 	return 0;
 }
 
-static const bool OpType::isUnaryOp(int opType)
+const bool OpType::isUnaryOp(int opType)
 {
 	switch (opType){
-	case B_Not:
-	case L_Not:
+	case B_NOT:
+	case L_NOT:
 		return true;
 	}
-	return 0;
+	return false;
 }
 
