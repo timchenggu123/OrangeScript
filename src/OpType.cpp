@@ -91,6 +91,9 @@ OpType::~OpType()
 	else if (op == "||") {
 		return L_OR;
 	}
+	else if (op == "=") {
+		return EQ;
+	}
 	return 0;
 }
 
