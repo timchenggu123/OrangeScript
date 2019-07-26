@@ -1,9 +1,11 @@
 #include <iostream>
 #include <sstream>
+#include <vector>
 #include "OpType.h"
 #include "Parser.h"
 #include "Lexer.h"
 #include "Ast.h"
+
 
 Parser::Parser()
 {
@@ -21,47 +23,121 @@ void Parser::scan(list<Lexer::Token*> *tokens, Ast* ast)
 		std::cerr << "error at parser schanner" << std::endl;
 		exit(1);
 	}
+
+	//declare a parse stack
+	std::vector<Ast::Exp*> parseStack;
+
+	//initialize a new code block as rootNode
 	list<Ast::Exp*>*args = new list<Ast::Exp*>;
 	Ast::Exp* rootNode = Ast::makeCodeBlock(args);
 	
+	//initialize variables for scan
 	Lexer::Token *token = tokens->front();
 	int startId = 0;
 	int endId = 0;
+	int codeBlockType = Ast::getCodeBlockType(token); // we take a peek at the first token to determine the code block type.
+	Ast::Exp* currentCodeBlock = rootNode;
+
 	while (token != nullptr) 
 	{
 		endId = token->id;
 
 		if (token->type == Lexer::BREAK) {
-			if (startId == endId) {
+			//we have reached the end of a statement
+			//time to parse this statement
+			if (startId + 1 == endId) {
+				//if we have an empty line, 
+				//we skip the line and do nothing
 				token = token->next;
 				continue;
 			}
-			rootNode->arguments->push_back(parseExpression(token, startId, endId));
+			if (codeBlockType = -999) {
+				//-999 is the return value for the end keyword.
+				//we pop off the stack.
+				parseStack.back()->arguments->push_back(currentCodeBlock);
+				currentCodeBlock = parseStack.back();
+				parseStack.pop_back();
+			}
+			else if (codeBlockType != -1) {
+				//we have found a keyword in the current statement
+				//intializing a new code block.
+
+				//we push the current codeblock on stack.
+				parseStack.push_back(currentCodeBlock);
+				switch (codeBlockType) {
+
+				case Ast::FOR:
+					list<Ast::Exp*>*args = new list<Ast::Exp*>;
+					Ast::Exp* control = parseExpression(token->next, startId + 1, endId);
+					Ast::Exp* forLoop = Ast::makeForLoop(control, args);
+					currentCodeBlock = forLoop;
+					break;
+				case Ast::WHILE:
+					//TODO: complete
+				case Ast::IF:
+					//TODO: complete
+				}
+			}
+			else
+			{
+				currentCodeBlock->arguments->push_back(parseExpression(token, startId, endId));
+			}
+
 			startId = token->id;
 			token = token->next;
-			continue;
+			
+			if (token != nullptr) {
+				//right before we proceed to next statement, we
+				//check the first token to determine if the token
+				//initialzes a new level of code block i.e. a for
+				//loop or a while loop, a function definition, etc. 
 
+				codeBlockType = Ast::getCodeBlockType(token);
+			}
+			continue;
 		}
+
+
 	 	token = token->next;
 	}
+
 	ast->setRoot(rootNode);
 }
 
+Ast::Exp* parseCodeBlock(Lexer::Token* token, int startId, int endId) {
+
+}
 Ast::Exp* Parser::parseExpression(Lexer::Token* token, int startId, int endId) {
-	int min_precedence = 0; //using a large number right now...could try infinity
+	//parseExpression is basically parseLeft with modifications.
+
+	int min_precedence = 0; 
 	int base_precedence = 0;
 	int expType = 0;
+
 	Lexer::Token* pivot;
+
 	while (token ->prev != nullptr &&
 		token->prev->id != startId) {
 		token = token->prev;
+		if (token->id == startId + 1) {
+			//we are at the begining of the expression 
+			//we need to check for keyword here.
+			if (token->type == Lexer::KEYWORD) {
+				if (token->text == "for") {
+
+				}
+			}
+		}
+
 		if (token->type == Lexer::OPERATOR) {
+
 			if (OpType::isBinaryOp(token->opType) &&
 				OpType::getPrecedence(token->opType) > min_precedence) {
 				min_precedence = OpType::getPrecedence(token->opType);
 				pivot = token;
 				expType = Ast::BINARY;
 			}
+
 		}
 		else {
 			continue;
