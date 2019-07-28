@@ -170,4 +170,26 @@ Ast::Exp* Ast::makeWhileLoop(Exp*condition,list<Exp*>* args){
 	return e;
 }
 
+int Ast::getCodeBlockType(Lexer::Token* token)
+{
+	//TODO complete this list
+	if (token->type == Lexer::KEYWORD) {
+		if (token->text == "for") {
+			return FOR;
+		}
+		else if (token->text == "while") {
+			return WHILE;
+		}
+		else if (token->text == "if") {
+			return IF;
+		}
+		else if (token->text == "end") {
+			return -999;
+		}
+	}
+	else {
+		return -1
+	}
+}
+
 

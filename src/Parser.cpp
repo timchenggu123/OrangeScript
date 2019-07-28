@@ -35,7 +35,7 @@ void Parser::scan(list<Lexer::Token*> *tokens, Ast* ast)
 	Lexer::Token *token = tokens->front();
 	int startId = 0;
 	int endId = 0;
-	int codeBlockType = Ast::getCodeBlockType(token); // we take a peek at the first token to determine the code block type.
+	int codeBlockType = Ast::getCodeBlockType(token->type); // we take a peek at the first token to determine the code block type.
 	Ast::Exp* currentCodeBlock = rootNode;
 
 	while (token != nullptr) 
@@ -92,7 +92,7 @@ void Parser::scan(list<Lexer::Token*> *tokens, Ast* ast)
 				//initialzes a new level of code block i.e. a for
 				//loop or a while loop, a function definition, etc. 
 
-				codeBlockType = Ast::getCodeBlockType(token);
+				codeBlockType = Ast::getCodeBlockType(token->type);
 			}
 			continue;
 		}

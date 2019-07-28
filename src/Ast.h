@@ -46,7 +46,8 @@ public:
 	static Exp* makeForLoop(Exp* control, list<Exp*>* args);
 	static Exp* makeIfConditional(Exp* condition, list<Exp*>* args);
 	static Exp* makeWhileLoop(Exp* condition, list<Exp*>* args);
-
+	
+	static int getCodeBlockType(Lexer::Token token);
 	//Exp* makeProjectionExp(list<Lexer::Token> tokens); //These are to be implemented in fur
 	//Exp* makeRecordExp(list<Lexer::Token> tokens);
 	Ast();
