@@ -30,6 +30,7 @@ Lexer::Lexer() :
 
 void Lexer::setUp() {
 	//TODO: add more 
+	//here lives the allowed keywords for the lexer
 	syntaxTrie->insert("for");
 	syntaxTrie->insert("continue");
 	syntaxTrie->insert("break");
@@ -37,6 +38,7 @@ void Lexer::setUp() {
 	syntaxTrie->insert("if");
 	syntaxTrie->insert("elif");
 	syntaxTrie->insert("else");
+	syntaxTrie->insert("end");
 }
 
 list<Lexer::Token*>* Lexer::run(string inputText) {
@@ -48,17 +50,31 @@ list<Lexer::Token*>* Lexer::run(string inputText) {
 	int* previous_type = new int[5]{ 0,0,0,0,0 };
 	bool check_out = false;;
 	bool multiple_lines = false;
+	bool f_nl = false;
+
+	//intialzing class utility variables. 
+	currentCol = 1;
+	currentLn = 1;
+	currentId = 1;
 	for (char c: inputText) {
 		/*This part of the code uses edge-triggered design to separate
 		input string into tokens.
 		*/
-		if (checkNewLine(c)) {
+		if (f_nl) {
+			//we are at a newline.
 			currentLn++;
 			buffer = "";
 			multiple_lines = true; //This flag checks if there is more than one line of code exist.
 			makeToken(returnObject, buffer, Tokens::BREAK);
-			charType->isEqual(previous_type,current_type);
-			continue;
+			f_nl = false;
+		}
+
+		if (checkNewLine(c)) {
+			//check to see if the current character is newline character. 
+			//if true, then we check out the current buffer and set 
+			//newline flag f_nl to true
+			check_out = true;
+			f_nl = true;
 		 }
 
 		current_type = charType->getCharType(c);
@@ -244,7 +260,7 @@ bool Lexer::isGrouper_2(string buffer)
 }
 
 bool Lexer::checkNewLine(char c){
-	if (c == 12){
+	if (c == 10){
 		return true;
 	}
 	return false;

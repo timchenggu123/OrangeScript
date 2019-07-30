@@ -20,7 +20,7 @@ void Parser::scan(list<Lexer::Token*> *tokens, Ast* ast)
 {	
 	if (tokens == nullptr) {
 		//TODO throw error
-		std::cerr << "error at parser schanner" << std::endl;
+		std::cerr << "error at parser scanner" << std::endl;
 		exit(1);
 	}
 
@@ -35,7 +35,7 @@ void Parser::scan(list<Lexer::Token*> *tokens, Ast* ast)
 	Lexer::Token *token = tokens->front();
 	int startId = 0;
 	int endId = 0;
-	int codeBlockType = Ast::getCodeBlockType(token->type); // we take a peek at the first token to determine the code block type.
+	int codeBlockType = Ast::getCodeBlockType(token); // we take a peek at the first token to determine the code block type.
 	Ast::Exp* currentCodeBlock = rootNode;
 
 	while (token != nullptr) 
@@ -51,7 +51,7 @@ void Parser::scan(list<Lexer::Token*> *tokens, Ast* ast)
 				token = token->next;
 				continue;
 			}
-			if (codeBlockType = -999) {
+			if (codeBlockType == -999) {
 				//-999 is the return value for the end keyword.
 				//we pop off the stack.
 				parseStack.back()->arguments->push_back(currentCodeBlock);
@@ -64,22 +64,34 @@ void Parser::scan(list<Lexer::Token*> *tokens, Ast* ast)
 
 				//we push the current codeblock on stack.
 				parseStack.push_back(currentCodeBlock);
-				switch (codeBlockType) {
 
-				case Ast::FOR:
-					list<Ast::Exp*>*args = new list<Ast::Exp*>;
-					Ast::Exp* control = parseExpression(token->next, startId + 1, endId);
+				if(codeBlockType == Ast::FOR)
+				{
+					args = new list<Ast::Exp*>;
+					Ast::Exp* control = parseExpression(token, startId + 1, endId);
 					Ast::Exp* forLoop = Ast::makeForLoop(control, args);
-					currentCodeBlock = forLoop;
-					break;
-				case Ast::WHILE:
-					//TODO: complete
-				case Ast::IF:
-					//TODO: complete
+					currentCodeBlock = forLoop; 
+				}
+				else if(codeBlockType == Ast::WHILE)
+				{
+					args = new list<Ast::Exp*>;
+					Ast::Exp* condition = parseExpression(token, startId + 1, endId);
+					Ast::Exp* whileLoop = Ast::makeWhileLoop(condition, args); 
+				}
+				else if (codeBlockType == Ast::IF)
+				{
+					args = new list<Ast::Exp*>;
+					Ast::Exp* condition = parseExpression(token, startId + 1, endId);
+					Ast::Exp* ifConditional = Ast::makeIfConditional(condition, args); 
+				}
+				else{
+					std::cerr << "Parser: Unexpected key word at beginning of statement at ln: " << token->ln;
+					exit(1);
 				}
 			}
 			else
 			{
+				//if no keyword found, add the statement to current codeblock
 				currentCodeBlock->arguments->push_back(parseExpression(token, startId, endId));
 			}
 
@@ -92,7 +104,7 @@ void Parser::scan(list<Lexer::Token*> *tokens, Ast* ast)
 				//initialzes a new level of code block i.e. a for
 				//loop or a while loop, a function definition, etc. 
 
-				codeBlockType = Ast::getCodeBlockType(token->type);
+				codeBlockType = Ast::getCodeBlockType(token);
 			}
 			continue;
 		}
@@ -100,13 +112,13 @@ void Parser::scan(list<Lexer::Token*> *tokens, Ast* ast)
 
 	 	token = token->next;
 	}
-
+	if (!parseStack.empty()) {
+		std::cerr << "Parser: Expecting end statement";
+		exit(1);
+	}
 	ast->setRoot(rootNode);
 }
 
-Ast::Exp* parseCodeBlock(Lexer::Token* token, int startId, int endId) {
-
-}
 Ast::Exp* Parser::parseExpression(Lexer::Token* token, int startId, int endId) {
 	//parseExpression is basically parseLeft with modifications.
 
@@ -119,15 +131,6 @@ Ast::Exp* Parser::parseExpression(Lexer::Token* token, int startId, int endId) {
 	while (token ->prev != nullptr &&
 		token->prev->id != startId) {
 		token = token->prev;
-		if (token->id == startId + 1) {
-			//we are at the begining of the expression 
-			//we need to check for keyword here.
-			if (token->type == Lexer::KEYWORD) {
-				if (token->text == "for") {
-
-				}
-			}
-		}
 
 		if (token->type == Lexer::OPERATOR) {
 
@@ -145,7 +148,7 @@ Ast::Exp* Parser::parseExpression(Lexer::Token* token, int startId, int endId) {
 
 	}
 	if (expType == 0) {
-		std::cerr << "expected expression at ln:" << token->ln << " col " << token->col;
+		std::cerr << "Paser: Expected expression at ln:" << token->ln << " col: " << token->col;
 	}
 	if (expType == Ast::BINARY) {
 			Ast::Exp* watch = Ast::makeBinaryExp(
@@ -250,6 +253,7 @@ Ast::Exp* Parser::parsePrimaryExpression(Lexer::Token* token) {
 
 		for (char c : token->text) {
 			if (c == '.') {
+				//rn this only returns a dummy expression
 				return Ast::makeDecimalExp(3.13);
 			}
 		}

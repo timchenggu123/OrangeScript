@@ -172,7 +172,8 @@ Ast::Exp* Ast::makeWhileLoop(Exp*condition,list<Exp*>* args){
 
 int Ast::getCodeBlockType(Lexer::Token* token)
 {
-	//TODO complete this list
+	//TODO: complete this list
+
 	if (token->type == Lexer::KEYWORD) {
 		if (token->text == "for") {
 			return FOR;
@@ -188,7 +189,7 @@ int Ast::getCodeBlockType(Lexer::Token* token)
 		}
 	}
 	else {
-		return -1
+		return -1;
 	}
 }
 
