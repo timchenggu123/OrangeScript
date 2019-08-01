@@ -152,7 +152,9 @@ list<Lexer::Token*>* Lexer::run(string inputText) {
 		}
 	}
 
-	if (!multiple_lines) {
+	if (returnObject->back()->type != Tokens::BREAK) {
+	//manually adding a break token at the end of the file
+	//if the end of file is not a break
 		makeToken(returnObject, buffer, Tokens::BREAK);
 	}
 

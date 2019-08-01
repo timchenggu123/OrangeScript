@@ -92,7 +92,19 @@ OpType::~OpType()
 		return L_OR;
 	}
 	else if (op == "=") {
-		return EQ;
+		return ASSIGN;
+	}
+	else if (op == "<") {
+		return LT;
+	}
+	else if (op == ">") {
+		return GT;
+	}
+	else if (op == ">=") {
+		return GTE;
+	}
+	else if (op == "<=") {
+		return LTE;
 	}
 	return 0;
 }

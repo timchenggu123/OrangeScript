@@ -37,12 +37,12 @@ void Parser::scan(list<Lexer::Token*> *tokens, Ast* ast)
 	int endId = 0;
 	int codeBlockType = Ast::getCodeBlockType(token); // we take a peek at the first token to determine the code block type.
 	Ast::Exp* currentCodeBlock = rootNode;
-
+	bool f_is_end = false;
 	while (token != nullptr) 
 	{
 		endId = token->id;
 
-		if (token->type == Lexer::BREAK) {
+		if (token->type == Lexer::BREAK ) {
 			//we have reached the end of a statement
 			//time to parse this statement
 			if (startId + 1 == endId) {
@@ -263,6 +263,9 @@ Ast::Exp* Parser::parsePrimaryExpression(Lexer::Token* token) {
 		ss >> num;
 		Ast::Exp* watch = Ast::makeIntegerExp(num);
 		return watch;
+	}
+	else if (token->type == Lexer::VARIABLE) {
+		return Ast::makeVariableExp(token->text);
 	}
 	else {
 		return nullptr;
