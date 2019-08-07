@@ -130,6 +130,11 @@ list<Lexer::Token*>* Lexer::run(string inputText) {
 			}
 			else if (isGrouper_1(buffer)) {
 				makeToken(returnObject, buffer, Tokens::GROUPER_1);
+				if (buffer == "(" &&
+					returnObject->back()->type == Tokens::VARIABLE)
+				{
+					makeToken(returnObject, "_call", Tokens::OPERATOR);
+				}
 				buffer = "";
 			}
 			else if (isGrouper_2(buffer)) {

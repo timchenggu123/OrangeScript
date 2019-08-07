@@ -106,6 +106,9 @@ OpType::~OpType()
 	else if (op == "<=") {
 		return LTE;
 	}
+	else if (op == "_call") {
+		return FUN_CALLS
+	}
 	return 0;
 }
 

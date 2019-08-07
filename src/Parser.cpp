@@ -61,10 +61,10 @@ void Parser::scan(list<Lexer::Token*> *tokens, Ast* ast)
 			else if (codeBlockType != -1) {
 				//we have found a keyword in the current statement
 				//intializing a new code block.
-
+				
 				//we push the current codeblock on stack.
 				parseStack.push_back(currentCodeBlock);
-
+				//TODO: complete list of possible begin-statement keywords.
 				if(codeBlockType == Ast::FOR)
 				{
 					args = new list<Ast::Exp*>;
@@ -83,7 +83,7 @@ void Parser::scan(list<Lexer::Token*> *tokens, Ast* ast)
 					args = new list<Ast::Exp*>;
 					Ast::Exp* condition = parseExpression(token, startId + 1, endId);
 					Ast::Exp* ifConditional = Ast::makeIfConditional(condition, args); 
-				}
+				} 
 				else{
 					std::cerr << "Parser: Unexpected key word at beginning of statement at ln: " << token->ln;
 					exit(1);
@@ -121,24 +121,48 @@ void Parser::scan(list<Lexer::Token*> *tokens, Ast* ast)
 
 Ast::Exp* Parser::parseExpression(Lexer::Token* token, int startId, int endId) {
 	//parseExpression is basically parseLeft with modifications.
-
-	int min_precedence = 0; 
+	int min_precedence;
 	int base_precedence = 0;
 	int expType = 0;
+	bool f_skip = false;
+
+	vector<Lexer::Token*> brkt_stk;
+	int brkt_start;
+	int brkt_end;
 
 	Lexer::Token* pivot;
 
 	while (token ->prev != nullptr &&
 		token->prev->id != startId) {
 		token = token->prev;
+		if (f_skip) {
+			continue;
+		}
 
 		if (token->type == Lexer::OPERATOR) {
 
 			if (OpType::isBinaryOp(token->opType) &&
-				OpType::getPrecedence(token->opType) > min_precedence) {
+				OpType::getPrecedence(token->opType) > min_precedence &&
+				brkt_stk.empty()) 
+			{
 				min_precedence = OpType::getPrecedence(token->opType);
 				pivot = token;
 				expType = Ast::BINARY;
+			}
+			else if (token->text == ")") {
+				brkt_stk.push_back(token);
+
+			}
+			else if (token->text == "(") {
+				
+				if (brkt_stk.empty()) {
+					std::cerr << "Parser:Expected closing bracket for token at ln:" << token->ln << " col:" << token->col;
+					exit(1);
+				}
+				else {
+					brkt_stk.pop_back;
+				}
+
 			}
 
 		}
@@ -150,6 +174,10 @@ Ast::Exp* Parser::parseExpression(Lexer::Token* token, int startId, int endId) {
 	if (expType == 0) {
 		std::cerr << "Paser: Expected expression at ln:" << token->ln << " col: " << token->col;
 	}
+	if (!brkt_stk.empty()) {
+		std::cerr << "Parser: Unmatched closing braket at ln:" << token->ln << " col:" << token->col;
+	}
+
 	if (expType == Ast::BINARY) {
 			Ast::Exp* watch = Ast::makeBinaryExp(
 				pivot->opType,parseLeft(pivot, startId), parseRight(pivot, endId));
@@ -184,7 +212,7 @@ Ast::Exp* Parser::parseLeft(Lexer::Token* token, int startId) {
 		if (token->type == Lexer::OPERATOR) {
 			if (OpType::isBinaryOp(token->opType) &&
 				OpType::getPrecedence(token->opType) > min_precedence) {
-				min_precedence = OpType::getPrecedence(token->opType);
+				min_precedence = OpType::getPrecedence(token->opType) + base_precedence;
 				pivot = token;
 				expType = Ast::BINARY;
 				token = token->prev;

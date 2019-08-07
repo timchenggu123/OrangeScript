@@ -17,7 +17,7 @@ public:
 		//not all types defined here are implemented 
 		//at the moment
 		NULL_TYPE,
-		FUN, MEM_ACC,
+		FUN_CALL, MEM_ACC,
 		INC, DEC, B_NOT, L_NOT, INDIR, ADDRESS,
 		MUL, DIV, MOD,
 		ADD, SUB,
