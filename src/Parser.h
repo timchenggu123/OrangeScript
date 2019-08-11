@@ -10,11 +10,7 @@ public:
 	Parser();
 	~Parser();
 
-	Ast::Exp* parseExpression(Lexer::Token* token, int startId, int endId);
-
-	Ast::Exp * parseLeft(Lexer::Token * token, int startId);
-
-	Ast::Exp * parseRight(Lexer::Token * token, int endId);
+	Ast::Exp* parseExpression(Lexer::Token* token_end, Lexer::Token* token_start);
 
 	Ast::Exp* parsePrimaryExpression(Lexer::Token* token);
 
