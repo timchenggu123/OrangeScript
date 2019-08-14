@@ -85,13 +85,6 @@ list<Lexer::Token*>* Lexer::run(string inputText) {
 		 }
 
 		current_type = charType->getCharType(c);
-		if (charType->isEqual(previous_type, CharType::LETTER)) {
-			//if the previous type is letter, and the current part is number,
-			//treat the current type as letter as well.
-			if (charType->isEqual(current_type, CharType::NUM)) {
-				current_type[0] = CharType::LETTER;
-			}
-		}
 
 		if (charType->isEqual(current_type, CharType::MARKER_2)){
 			if (listening_string) {

@@ -1,5 +1,5 @@
 #include "Ast.h"
-#include <sstream>
+
 Ast::Ast():
 	root(nullptr)
 {
@@ -28,28 +28,21 @@ Ast::Exp * Ast::makeIntegerExp(int i)
 	e->left = nullptr;
 	e->right = nullptr;
 	e->str_attr = "";
-	e->deci_attr = ;
 	e->int_attr = i;
 	e->arguments = nullptr;
 	return e;
 }
 
-Ast::Exp * Ast::makeDecimalExp(string s)
+Ast::Exp * Ast::makeDecimalExp(double d)
 {
 	//TODO: add decimal attr
-
-	std::stringstream ss(s);
-	double num = 0;
-	ss >> num;
-
 	Exp *e = new Exp;
-	e->expType = Decimal;
+	e->expType = INTEGER;
 	e->opType = NULL;
 	e->parent = nullptr;
 	e->left = nullptr;
 	e->right = nullptr;
 	e->str_attr = "";
-	e->deci_attr = num;
 	e->int_attr = NULL;
 	e->arguments = nullptr;
 	return e;
@@ -78,7 +71,6 @@ Ast::Exp * Ast::makeVariableExp(string s)
 	e->left = nullptr;
 	e->right = nullptr;
 	e->str_attr = s;
-	e->deci_attr = NULL;
 	e->int_attr = NULL;
 	e->arguments = nullptr;
 	return e;
@@ -94,7 +86,6 @@ Ast::Exp * Ast::makeUnaryExp(int opType, Exp * l)
 	e->right = nullptr;
 	e->str_attr = "";
 	e->int_attr = NULL;
-	e->deci_attr = NULL;
 	e->arguments = nullptr;
 	return e;
 }
@@ -108,7 +99,6 @@ Ast::Exp * Ast::makeBinaryExp(int opType, Exp * l, Exp * r)
 	e->left = l;
 	e->right = r;
 	e->str_attr = "";
-	e->deci_attr = NULL;
 	e->int_attr = NULL;
 	e->arguments = nullptr;
 	return e;
@@ -123,7 +113,6 @@ Ast::Exp * Ast::makeCallExp(string name, list<Exp*>* args)
 	e->left = nullptr;
 	e->right = nullptr;
 	e->str_attr = name;
-	e->deci_attr = NULL;
 	e->int_attr = NULL;
 	e->arguments = args;
 	return e;
@@ -138,7 +127,6 @@ Ast::Exp* Ast::makeCodeBlock(list<Exp*>* args){
 	e->right = nullptr;
 	e->str_attr = "";
 	e->int_attr = NULL;
-	e->deci_attr = NULL;
 	e->arguments = args;
 	return e;
 }
@@ -151,7 +139,6 @@ Ast::Exp* Ast::makeForLoop(Exp*control,list<Exp*>* args){
 	e->left = control;
 	e->right = nullptr;
 	e->str_attr = "";
-	e->deci_attr = NULL;
 	e->int_attr = NULL;
 	e->arguments = args;
 	return e;
@@ -165,7 +152,6 @@ Ast::Exp* Ast::makeIfConditional(Exp*condition,list<Exp*>* args){
 	e->left = condition;
 	e->right = nullptr;
 	e->str_attr = "";
-	e->deci_attr = NULL;
 	e->int_attr = NULL;
 	e->arguments = args;
 	return e;
@@ -179,24 +165,8 @@ Ast::Exp* Ast::makeWhileLoop(Exp*condition,list<Exp*>* args){
 	e->left = condition;
 	e->right = nullptr;
 	e->str_attr = "";
-	e->deci_attr = NULL;
 	e->int_attr = NULL;
 	e->arguments = args;
-	return e;
-}
-
-Ast::Exp * Ast::makeDeclareVar(Exp * assignment)
-{
-	Exp* e = new Exp;
-	e->expType = WHILE;
-	e->opType = NULL;
-	e->parent = nullptr;
-	e->left = assignment;
-	e->right = nullptr;
-	e->str_attr = "";
-	e->deci_attr = NULL;
-	e->int_attr = NULL;
-	e->arguments = nullptr;
 	return e;
 }
 

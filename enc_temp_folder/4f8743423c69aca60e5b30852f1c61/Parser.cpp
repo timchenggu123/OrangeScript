@@ -77,24 +77,14 @@ void Parser::scan(list<Lexer::Token*> *tokens, Ast* ast)
 					args = new list<Ast::Exp*>;
 					Ast::Exp* condition = parseExpression(token_start->next, token);
 					Ast::Exp* whileLoop = Ast::makeWhileLoop(condition, args); 
-					currentCodeBlock = whileLoop;
 				}
 				else if (codeBlockType == Ast::IF)
 				{
 					args = new list<Ast::Exp*>;
 					Ast::Exp* condition = parseExpression(token_start->next, token);
 					Ast::Exp* ifConditional = Ast::makeIfConditional(condition, args); 
-					currentCodeBlock = ifConditional;
-				}
-				else if (codeBlockType == Ast::DECLARE) {
-					args = new list<Ast::Exp*>;
-					Ast::Exp* assignment = parseExpression(token_start->next, token);
-					Ast::Exp* declareVar = Ast::makeDeclareVar(assignment);
-					currentCodeBlock = declareVar;
 				}
 				else{
-					//This should theoretically never be called
-					//If called, Ast defintion might be out of sync with lexer definition.
 					std::cerr << "Parser: Unexpected key word at beginning of statement at ln: " << token->ln;
 					exit(1);
 				}
@@ -205,18 +195,20 @@ Ast::Exp* Parser::parseExpression(Lexer::Token* token_start, Lexer::Token* token
 	}
 	//parse unary expression
 
-	//This should only be called if the Expression length is 0; 
-	//Always keep this line checked. 
+	//Return null pointer should not be called. Always keep this return statement on watch. 
 	return nullptr;
 }
 
 
 Ast::Exp* Parser::parsePrimaryExpression(Lexer::Token* token) {
 	if (token->type == Lexer::NUM_LITERAL) {
+		//TODO: modify this so it actually return a decimal expression.
+		//might need to modify makeDecimalExp too.
 
 		for (char c : token->text) {
 			if (c == '.') {
-				return Ast::makeDecimalExp(token->text);
+				//rn this only returns a dummy expression
+				return Ast::makeDecimalExp(3.13);
 			}
 		}
 
@@ -228,9 +220,6 @@ Ast::Exp* Parser::parsePrimaryExpression(Lexer::Token* token) {
 	}
 	else if (token->type == Lexer::VARIABLE) {
 		return Ast::makeVariableExp(token->text);
-	}
-	else if (token->type == Lexer::STR_LITERAL) {
-		return Ast::makeStringExp(token->text);
 	}
 	else {
 		return nullptr;

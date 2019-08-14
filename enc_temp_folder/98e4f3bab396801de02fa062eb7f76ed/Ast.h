@@ -33,12 +33,11 @@ public:
 		Exp* right;
 		string str_attr;
 		int int_attr;
-		double deci_attr;
 		list<Exp*>* arguments;
 	};
 
 	static Exp* makeIntegerExp(int i);
-	static Exp* makeDecimalExp(string s);
+	static Exp* makeDecimalExp(double d);
 	static Exp* makeStringExp(string s);
 	static Exp* makeVariableExp(string s);
 	static Exp* makeUnaryExp(int opType, Exp* l);
@@ -48,7 +47,6 @@ public:
 	static Exp* makeForLoop(Exp* control, list<Exp*>* args);
 	static Exp* makeIfConditional(Exp* condition, list<Exp*>* args);
 	static Exp* makeWhileLoop(Exp* condition, list<Exp*>* args);
-	static Exp* makeDeclareVar(Exp* assignment);
 	
 	static int getCodeBlockType(Lexer::Token* token);
 	//Exp* makeProjectionExp(list<Lexer::Token> tokens); //These are to be implemented in fur

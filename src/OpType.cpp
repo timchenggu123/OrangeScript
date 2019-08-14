@@ -14,7 +14,7 @@ OpType::~OpType()
  int OpType::getPrecedence(int opType)
 {
 	switch (opType) {
-		case FUN:
+		case FUN_CALL:
 		case MEM_ACC:
 			return 1;
 		case INC:
@@ -107,7 +107,7 @@ OpType::~OpType()
 		return LTE;
 	}
 	else if (op == "_call") {
-		return FUN_CALLS
+		return FUN_CALL;
 	}
 	return 0;
 }
