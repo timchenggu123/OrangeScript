@@ -239,19 +239,3 @@ Ast::Exp* Parser::parsePrimaryExpression(Lexer::Token* token) {
 }
 
 
-
-/*
-
-Ast::Exp* Parser::parseExpressions(Lexer::Token* root) {
-	return parseExpression(root, 0);
-}
-
-Ast::Exp* Parser::parseExpression(Lexer::Token* lhs, int precedence) {
-	Lexer::Token* peek = lhs->next;
-
-	while (OpType::isBinaryOp(peek ->type) &&
-		OpType::getPrecedence(peek->type) >= precedence)
-
-}
-
-*/
