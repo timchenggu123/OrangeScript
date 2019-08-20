@@ -19,7 +19,7 @@ void Ast::setRoot(Exp * node)
 	root = node;
 }
 
-Ast::Exp * Ast::makeIntegerExp(int i)
+Ast::Exp * Ast::makeIntegerExp(int i, int ln, int col)
 {
 	Exp *e = new Exp;
 	e->expType = INTEGER;
@@ -28,13 +28,16 @@ Ast::Exp * Ast::makeIntegerExp(int i)
 	e->left = nullptr;
 	e->right = nullptr;
 	e->str_attr = "";
-	e->deci_attr = ;
+	e->deci_attr = NULL;
 	e->int_attr = i;
 	e->arguments = nullptr;
+	e->is_int_attr = true;
+	e->ln = ln;
+	e->col = col;
 	return e;
 }
 
-Ast::Exp * Ast::makeDecimalExp(string s)
+Ast::Exp * Ast::makeDecimalExp(string s, int ln, int col)
 {
 	//TODO: add decimal attr
 
@@ -43,7 +46,7 @@ Ast::Exp * Ast::makeDecimalExp(string s)
 	ss >> num;
 
 	Exp *e = new Exp;
-	e->expType = Decimal;
+	e->expType = DECIMAL;
 	e->opType = NULL;
 	e->parent = nullptr;
 	e->left = nullptr;
@@ -52,10 +55,13 @@ Ast::Exp * Ast::makeDecimalExp(string s)
 	e->deci_attr = num;
 	e->int_attr = NULL;
 	e->arguments = nullptr;
+	e->is_double_attr = true;
+	e->ln = ln;
+	e->col = col;
 	return e;
 }
 
-Ast::Exp * Ast::makeStringExp(string s)
+Ast::Exp * Ast::makeStringExp(string s, int ln, int col)
 {
 	Exp *e = new Exp;
 	e->expType = STRING;
@@ -66,10 +72,13 @@ Ast::Exp * Ast::makeStringExp(string s)
 	e->str_attr = s;
 	e->int_attr = NULL;
 	e->arguments = nullptr;
+	e->is_str_attr = true;
+	e->ln = ln;
+	e->col = col;
 	return e;
 }
 
-Ast::Exp * Ast::makeVariableExp(string s)
+Ast::Exp * Ast::makeVariableExp(string s, int ln, int col)
 {
 	Exp *e = new Exp;
 	e->expType = VARIABLE;
@@ -81,10 +90,13 @@ Ast::Exp * Ast::makeVariableExp(string s)
 	e->deci_attr = NULL;
 	e->int_attr = NULL;
 	e->arguments = nullptr;
+	e->is_symbolic_return = true;
+	e->ln = ln;
+	e->col = col;
 	return e;
 }
 
-Ast::Exp * Ast::makeUnaryExp(int opType, Exp * l)
+Ast::Exp * Ast::makeUnaryExp(int opType, Exp * l, int ln, int col)
 {
 	Exp *e = new Exp;
 	e->expType = UNARY;
@@ -96,10 +108,12 @@ Ast::Exp * Ast::makeUnaryExp(int opType, Exp * l)
 	e->int_attr = NULL;
 	e->deci_attr = NULL;
 	e->arguments = nullptr;
+	e->ln = ln;
+	e->col = col;
 	return e;
 }
 
-Ast::Exp * Ast::makeBinaryExp(int opType, Exp * l, Exp * r)
+Ast::Exp * Ast::makeBinaryExp(int opType, Exp * l, Exp * r, int ln, int col)
 {
 	Exp *e = new Exp;
 	e->expType = BINARY;
@@ -111,10 +125,12 @@ Ast::Exp * Ast::makeBinaryExp(int opType, Exp * l, Exp * r)
 	e->deci_attr = NULL;
 	e->int_attr = NULL;
 	e->arguments = nullptr;
+	e->ln = ln;
+	e->col = col;
 	return e;
 }
 
-Ast::Exp * Ast::makeCallExp(string name, list<Exp*>* args)
+Ast::Exp * Ast::makeCallExp(string name, list<Exp*>* args, int ln, int col)
 {
 	Exp *e = new Exp;
 	e->expType = CALL;
@@ -126,10 +142,12 @@ Ast::Exp * Ast::makeCallExp(string name, list<Exp*>* args)
 	e->deci_attr = NULL;
 	e->int_attr = NULL;
 	e->arguments = args;
+	e->ln = ln;
+	e->col = col;
 	return e;
 }
 
-Ast::Exp* Ast::makeCodeBlock(list<Exp*>* args){
+Ast::Exp* Ast::makeCodeBlock(list<Exp*>* args, int ln, int col){
 	Exp* e = new Exp;
 	e->expType = CODE_BLK;
 	e->opType = NULL;
@@ -140,10 +158,12 @@ Ast::Exp* Ast::makeCodeBlock(list<Exp*>* args){
 	e->int_attr = NULL;
 	e->deci_attr = NULL;
 	e->arguments = args;
+	e->ln = ln;
+	e->col = col;
 	return e;
 }
 
-Ast::Exp* Ast::makeForLoop(Exp*control,list<Exp*>* args){
+Ast::Exp* Ast::makeForLoop(Exp*control,list<Exp*>* args, int ln, int col){
 	Exp* e = new Exp;
 	e->expType = FOR;
 	e->opType = NULL;
@@ -154,10 +174,12 @@ Ast::Exp* Ast::makeForLoop(Exp*control,list<Exp*>* args){
 	e->deci_attr = NULL;
 	e->int_attr = NULL;
 	e->arguments = args;
+	e->ln = ln;
+	e->col = col;
 	return e;
 }
 
-Ast::Exp* Ast::makeIfConditional(Exp*condition,list<Exp*>* args){
+Ast::Exp* Ast::makeIfConditional(Exp*condition,list<Exp*>* args, int ln, int col){
 	Exp* e = new Exp;
 	e->expType = IF;
 	e->opType = NULL;
@@ -168,10 +190,12 @@ Ast::Exp* Ast::makeIfConditional(Exp*condition,list<Exp*>* args){
 	e->deci_attr = NULL;
 	e->int_attr = NULL;
 	e->arguments = args;
+	e->ln = ln;
+	e->col = col;
 	return e;
 }
 
-Ast::Exp* Ast::makeWhileLoop(Exp*condition,list<Exp*>* args){
+Ast::Exp* Ast::makeWhileLoop(Exp*condition,list<Exp*>* args, int ln, int col){
 	Exp* e = new Exp;
 	e->expType = WHILE;
 	e->opType = NULL;
@@ -182,10 +206,12 @@ Ast::Exp* Ast::makeWhileLoop(Exp*condition,list<Exp*>* args){
 	e->deci_attr = NULL;
 	e->int_attr = NULL;
 	e->arguments = args;
+	e->ln = ln;
+	e->col = col;
 	return e;
 }
 
-Ast::Exp * Ast::makeDeclareVar(Exp * assignment)
+Ast::Exp * Ast::makeDeclareVar(Exp * assignment, int ln, int col)
 {
 	Exp* e = new Exp;
 	e->expType = WHILE;
@@ -197,11 +223,15 @@ Ast::Exp * Ast::makeDeclareVar(Exp * assignment)
 	e->deci_attr = NULL;
 	e->int_attr = NULL;
 	e->arguments = nullptr;
+	e->ln = ln;
+	e->col = col;
 	return e;
 }
 
 int Ast::getCodeBlockType(Lexer::Token* token)
 {
+	//Note, when adding a keyword, this method and isCodeBlock method
+	//both need to be changed. 
 	//TODO: complete this list
 
 	if (token->type == Lexer::KEYWORD) {
@@ -224,6 +254,19 @@ int Ast::getCodeBlockType(Lexer::Token* token)
 	else {
 		return -1;
 	}
+}
+
+bool Ast::isCodeBlock(Exp * e)
+{
+	switch (e->expType) {
+	case FOR:
+	case WHILE:
+	case IF:
+	case DECLARE:
+		return true;
+	}
+
+	return false;
 }
 
 

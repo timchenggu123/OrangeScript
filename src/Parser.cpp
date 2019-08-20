@@ -169,6 +169,13 @@ Ast::Exp* Parser::parseExpression(Lexer::Token* token_start, Lexer::Token* token
 				pivot = token;
 				expType = Ast::BINARY;
 			}
+			else if (OpType::isUnaryOp(token->opType) &&
+				OpType::getPrecedence(token->opType) > min_precedence)
+			{
+				min_precedence = OpType::getPrecedence(token->opType);
+				pivot = token;
+				expType = Ast::UNARY;
+			}
 			
 
 		} else if(token->text == "(") {
@@ -202,6 +209,47 @@ Ast::Exp* Parser::parseExpression(Lexer::Token* token_start, Lexer::Token* token
 			Ast::Exp* result = Ast::makeBinaryExp(
 				pivot->opType,parseExpression(token_start, pivot), parseExpression(pivot,token_end));
 			return result;
+	}
+
+	if (expType == Ast::UNARY) {
+		switch (OpType::LeftOrRightAssociate(pivot->opType)) {
+		case OpType::RIGHT_ASSOC:
+			if (pivot->prev->id != startId) {
+				std::cerr << "Parser: Unexpected expression at ln:" << pivot->ln << " col:" <<pivot->col << std::endl;
+				exit(1);
+			}
+			Ast::Exp* result = Ast::makeUnaryExp(
+				pivot->opType, parseExpression(pivot, token_end)
+			);
+			return result;
+
+		case OpType::LEFT_ASSOC:
+			if (pivot->next->id != endId) {
+				std::cerr << "Parser: Unexpected expression at ln:" << pivot->ln << " col:" << pivot->col << std::endl;
+				exit(1);
+			}
+			Ast::Exp* result = Ast::makeUnaryExp(
+				pivot->opType, parseExpression(token_start, pivot)
+			);
+			return result;
+
+		case OpType::INDETERMINATE:
+			if (pivot->prev->id == startId) {
+				Ast::Exp*result = Ast::makeUnaryExp(
+					pivot->opType, parseExpression(pivot, token_end)
+				);
+			}
+			else if (pivot->next->id == endId) {
+				Ast::Exp* result = Ast::makeUnaryExp(
+					pivot->opType, parseExpression(token_start, pivot)
+				);
+			}
+			else {
+				std::cerr << "Parser: Unexpected expression at ln:" << pivot->ln << " col:" << pivot->col << std::endl;
+				exit(1);
+			}
+			return result;
+		}
 	}
 	//parse unary expression
 

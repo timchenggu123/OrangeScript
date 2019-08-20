@@ -100,6 +100,7 @@
   <ItemGroup>
     <ClCompile Include="src\Ast.cpp" />
     <ClCompile Include="src\CharType.cpp" />
+    <ClCompile Include="src\Intepreter.cpp" />
     <ClCompile Include="src\Lexer.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\OpType.cpp" />
@@ -110,6 +111,7 @@
   <ItemGroup>
     <ClInclude Include="src\Ast.h" />
     <ClInclude Include="src\CharType.h" />
+    <ClInclude Include="src\Intepreter.h" />
     <ClInclude Include="src\Lexer.h" />
     <ClInclude Include="src\OpType.h" />
     <ClInclude Include="src\Parser.h" />

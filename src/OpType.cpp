@@ -147,3 +147,16 @@ OpType::~OpType()
 	return false;
 }
 
+ bool OpType::LeftOrRightAssociate(int OpType)
+ {
+	 switch (OpType) {
+	 case L_NOT:
+	 case B_NOT:
+		 return RIGHT_ASSOC;
+	 case INC:
+	 case DEC:
+		 return INDETERMINATE;
+
+	}
+ }
+

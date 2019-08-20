@@ -33,12 +33,19 @@ public:
 		COMMA
 	};
 
+	enum Associtivity {
+		RIGHT_ASSOC,
+		LEFT_ASSOC,
+		INDETERMINATE
+	};
+
 	OpType();
 	~OpType();
 	static  int getPrecedence(int opType);
 	static  int getOpType(string op);
 	static  bool isBinaryOp(int opType);
 	static  bool isUnaryOp(int opType);
+	static  bool LeftOrRightAssociate(int OpType);
 };
 
 #endif

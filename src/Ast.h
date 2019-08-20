@@ -12,7 +12,7 @@ public:
 	enum ExpType {
 		INTEGER,
 		DECLARE,
-		Decimal,
+		DECIMAL,
 		STRING,
 		VARIABLE,
 		UNARY,
@@ -35,22 +35,39 @@ public:
 		int int_attr;
 		double deci_attr;
 		list<Exp*>* arguments;
+
+		string str_return;
+		int int_return;
+		double double_return;
+
+		bool is_str_return = false;
+		bool is_int_return = false;
+		bool is_double_return = false;
+		bool is_symbolic_return = false;
+
+		bool is_str_attr = false;
+		bool is_int_attr = false;
+		bool is_double_attr = false;
+
+		int ln = -1;
+		int col = -1;
 	};
 
-	static Exp* makeIntegerExp(int i);
-	static Exp* makeDecimalExp(string s);
-	static Exp* makeStringExp(string s);
-	static Exp* makeVariableExp(string s);
-	static Exp* makeUnaryExp(int opType, Exp* l);
-	static Exp* makeBinaryExp(int opType, Exp* l, Exp* r);
-	static Exp* makeCallExp(string name, list<Exp*>* args);
-	static Exp* makeCodeBlock(list<Exp*>* args);
-	static Exp* makeForLoop(Exp* control, list<Exp*>* args);
-	static Exp* makeIfConditional(Exp* condition, list<Exp*>* args);
-	static Exp* makeWhileLoop(Exp* condition, list<Exp*>* args);
-	static Exp* makeDeclareVar(Exp* assignment);
+	static Exp* makeIntegerExp(int i, int ln, int col);
+	static Exp* makeDecimalExp(string s, int ln, int col);
+	static Exp* makeStringExp(string s, int ln, int col);
+	static Exp* makeVariableExp(string s, int ln, int col);
+	static Exp* makeUnaryExp(int opType, Exp* l, int ln, int col);
+	static Exp* makeBinaryExp(int opType, Exp* l, Exp* r, int ln, int col);
+	static Exp* makeCallExp(string name, list<Exp*>* args, int ln, int col);
+	static Exp* makeCodeBlock(list<Exp*>* args, int ln, int col);
+	static Exp* makeForLoop(Exp* control, list<Exp*>* args, int ln, int col);
+	static Exp* makeIfConditional(Exp* condition, list<Exp*>* args, int ln, int col);
+	static Exp* makeWhileLoop(Exp* condition, list<Exp*>* args, int ln, int col);
+	static Exp* makeDeclareVar(Exp* assignment, int ln, int col);
 	
 	static int getCodeBlockType(Lexer::Token* token);
+	static bool isCodeBlock(Exp* e);
 	//Exp* makeProjectionExp(list<Lexer::Token> tokens); //These are to be implemented in fur
 	//Exp* makeRecordExp(list<Lexer::Token> tokens);
 	Ast();
