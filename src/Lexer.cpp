@@ -1,6 +1,6 @@
 #include "Trie.h"
 #include "Lexer.h"
-
+#include "Ast.h"
 
 #include <fstream>
 #include <iostream>
@@ -31,14 +31,10 @@ Lexer::Lexer() :
 void Lexer::setUp() {
 	//TODO: add more 
 	//here lives the allowed keywords for the lexer
-	syntaxTrie->insert("for");
-	syntaxTrie->insert("continue");
-	syntaxTrie->insert("break");
-	syntaxTrie->insert("while");
-	syntaxTrie->insert("if");
-	syntaxTrie->insert("elif");
-	syntaxTrie->insert("else");
-	syntaxTrie->insert("end");
+	for (std::vector<std::string>::const_iterator it = keyword_list.begin(); 
+		it != keyword_list.end(); it++) {
+		syntaxTrie->insert(*it);
+	}
 }
 
 list<Lexer::Token*>* Lexer::run(string inputText) {
@@ -51,6 +47,7 @@ list<Lexer::Token*>* Lexer::run(string inputText) {
 	bool check_out = false;;
 	bool multiple_lines = false;
 	bool f_nl = false;
+	bool ignore_nl = false;
 
 	//intialzing class utility variables. 
 	currentCol = 0;
@@ -68,10 +65,12 @@ list<Lexer::Token*>* Lexer::run(string inputText) {
 			//we are at a newline.
 			currentLn++;
 			currentCol = 0;
-			buffer = "";
 			multiple_lines = true; //This flag checks if there is more than one line of code exist.
-			makeToken(returnObject, buffer, Tokens::BREAK);
-			f_nl = false;
+			if (!ignore_nl) {
+				buffer = "";
+				makeToken(returnObject, buffer, Tokens::BREAK);
+				f_nl = false;
+			}
 		}
 
 		currentCol++;
@@ -96,6 +95,7 @@ list<Lexer::Token*>* Lexer::run(string inputText) {
 		if (charType->isEqual(current_type, CharType::MARKER_2)){
 			if (listening_string) {
 				listening_string = false;
+				ignore_nl = false;
 				makeToken(returnObject, buffer, Tokens::STR_LITERAL);
 				charType->isEqual(previous_type,current_type);
 				buffer = "";
@@ -103,6 +103,7 @@ list<Lexer::Token*>* Lexer::run(string inputText) {
 			}
 			else {
 				listening_string = true;
+				ignore_nl = true;
 				continue;
 			}
 		}
@@ -150,10 +151,12 @@ list<Lexer::Token*>* Lexer::run(string inputText) {
 					makeToken(returnObject, "_call", Tokens::OPERATOR);
 				}
 				buffer = "";
+				ignore_nl = true;
 			}
 			else if (isGrouper_2(buffer)) {
 				makeToken(returnObject, buffer, Tokens::GROUPER_2);
 				buffer = "";
+				ignore_nl = false;
 			}
 			else if (buffer.length() != 0) {
 				//TODO show more details 

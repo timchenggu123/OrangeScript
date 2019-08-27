@@ -35,6 +35,18 @@ public:
 		GROUPER_2,
 		BREAK
 	};
+
+	const std::vector<string> keyword_list = {
+		"for",
+		"break",
+		"continue",
+		"while",
+		"if",
+		"else",
+		"elseif",
+		"end"
+	};
+
 	Lexer();
 	list<Token*>* run(string inputFile);
 

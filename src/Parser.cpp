@@ -5,6 +5,7 @@
 #include "Parser.h"
 #include "Lexer.h"
 #include "Ast.h"
+#include "Intepreter.h"
 
 
 Parser::Parser()
@@ -29,7 +30,7 @@ void Parser::scan(list<Lexer::Token*> *tokens, Ast* ast)
 
 	//initialize a new code block as rootNode
 	list<Ast::Exp*>*args = new list<Ast::Exp*>;
-	Ast::Exp* rootNode = Ast::makeCodeBlock(args);
+	Ast::Exp* rootNode = Ast::makeCodeBlock(args,0,0);
 	
 	//initialize variables for scan
 
@@ -69,27 +70,27 @@ void Parser::scan(list<Lexer::Token*> *tokens, Ast* ast)
 				{
 					args = new list<Ast::Exp*>;
 					Ast::Exp* control = parseExpression(token_start->next, token);
-					Ast::Exp* forLoop = Ast::makeForLoop(control, args);
+					Ast::Exp* forLoop = Ast::makeForLoop(control, args,token->ln,token->col);
 					currentCodeBlock = forLoop; 
 				}
 				else if(codeBlockType == Ast::WHILE)
 				{
 					args = new list<Ast::Exp*>;
 					Ast::Exp* condition = parseExpression(token_start->next, token);
-					Ast::Exp* whileLoop = Ast::makeWhileLoop(condition, args); 
+					Ast::Exp* whileLoop = Ast::makeWhileLoop(condition, args,token->ln, token->col);
 					currentCodeBlock = whileLoop;
 				}
 				else if (codeBlockType == Ast::IF)
 				{
 					args = new list<Ast::Exp*>;
 					Ast::Exp* condition = parseExpression(token_start->next, token);
-					Ast::Exp* ifConditional = Ast::makeIfConditional(condition, args); 
+					Ast::Exp* ifConditional = Ast::makeIfConditional(condition, args,token->ln, token->col);
 					currentCodeBlock = ifConditional;
 				}
 				else if (codeBlockType == Ast::DECLARE) {
 					args = new list<Ast::Exp*>;
 					Ast::Exp* assignment = parseExpression(token_start->next, token);
-					Ast::Exp* declareVar = Ast::makeDeclareVar(assignment);
+					Ast::Exp* declareVar = Ast::makeDeclareVar(assignment, token->ln, token->col);
 					currentCodeBlock = declareVar;
 				}
 				else{
@@ -207,7 +208,8 @@ Ast::Exp* Parser::parseExpression(Lexer::Token* token_start, Lexer::Token* token
 
 	if (expType == Ast::BINARY) {
 			Ast::Exp* result = Ast::makeBinaryExp(
-				pivot->opType,parseExpression(token_start, pivot), parseExpression(pivot,token_end));
+				pivot->opType,parseExpression(token_start, pivot), parseExpression(pivot,token_end),
+				pivot->ln, pivot->col);
 			return result;
 	}
 
@@ -219,7 +221,8 @@ Ast::Exp* Parser::parseExpression(Lexer::Token* token_start, Lexer::Token* token
 				exit(1);
 			}
 			Ast::Exp* result = Ast::makeUnaryExp(
-				pivot->opType, parseExpression(pivot, token_end)
+				pivot->opType, parseExpression(pivot, token_end),
+				pivot->ln, pivot->col
 			);
 			return result;
 
@@ -229,26 +232,29 @@ Ast::Exp* Parser::parseExpression(Lexer::Token* token_start, Lexer::Token* token
 				exit(1);
 			}
 			Ast::Exp* result = Ast::makeUnaryExp(
-				pivot->opType, parseExpression(token_start, pivot)
+				pivot->opType, parseExpression(token_start, pivot),
+				pivot->ln, pivot->col
 			);
 			return result;
 
 		case OpType::INDETERMINATE:
 			if (pivot->prev->id == startId) {
 				Ast::Exp*result = Ast::makeUnaryExp(
-					pivot->opType, parseExpression(pivot, token_end)
+					pivot->opType, parseExpression(pivot, token_end),
+					pivot->ln, pivot->col
 				);
 			}
 			else if (pivot->next->id == endId) {
 				Ast::Exp* result = Ast::makeUnaryExp(
-					pivot->opType, parseExpression(token_start, pivot)
+					pivot->opType, parseExpression(token_start, pivot),
+					pivot->ln, pivot->col
 				);
 			}
 			else {
 				std::cerr << "Parser: Unexpected expression at ln:" << pivot->ln << " col:" << pivot->col << std::endl;
 				exit(1);
 			}
-			return result;
+			return;
 		}
 	}
 	//parse unary expression
@@ -264,21 +270,29 @@ Ast::Exp* Parser::parsePrimaryExpression(Lexer::Token* token) {
 
 		for (char c : token->text) {
 			if (c == '.') {
-				return Ast::makeDecimalExp(token->text);
+				return Ast::makeDecimalExp(token->text, token->ln, token->col);
 			}
 		}
 
 		std::stringstream ss(token->text);
 		int num = 0;
 		ss >> num;
-		Ast::Exp* watch = Ast::makeIntegerExp(num);
+		Ast::Exp* watch = Ast::makeIntegerExp(num, token->ln, token->col);
 		return watch;
 	}
 	else if (token->type == Lexer::VARIABLE) {
-		return Ast::makeVariableExp(token->text);
+		return Ast::makeVariableExp(token->text,token->ln, token->col);
 	}
 	else if (token->type == Lexer::STR_LITERAL) {
-		return Ast::makeStringExp(token->text);
+		return Ast::makeStringExp(token->text, token->ln, token->col);
+	}
+	else if (token->type == Lexer::KEYWORD) {
+		int instr = Intepreter::getInstructionType(token->text);
+		if (instr == -999) {
+			std::cerr << "Parser: Invalid instruction at ln:" << token->ln << " col" << token->col;
+		}
+		return Ast::makeInstruction(Intepreter::getInstructionType(token->text),
+			token->ln, token->col);
 	}
 	else {
 		return nullptr;

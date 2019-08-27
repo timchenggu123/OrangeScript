@@ -18,10 +18,21 @@ void Intepreter::execute(Ast::Exp * root)
 	post_order_walk(root);
 }
 
-void Intepreter::post_order_walk(Ast::Exp * node)
+int Intepreter::getInstructionType(std::string label)
+{
+	if (label == "break") {
+		return BREAK;
+	}
+	else if (label == "continue") {
+		return CONTINUE;
+	}
+	return -999;
+}
+
+int Intepreter::post_order_walk(Ast::Exp * node)
 {
 	if (Ast::isCodeBlock(node)) {
-		code_block_walk(node);
+		return code_block_walk(node);
 	}
 	else if (node->left == nullptr &&
 		node->right == nullptr) {
@@ -36,6 +47,7 @@ void Intepreter::post_order_walk(Ast::Exp * node)
 		post_order_walk(node->left);
 		intepret_node(node);
 	}
+	return 0;
 }
 
 void Intepreter::intepret_node(Ast::Exp * node)
@@ -149,9 +161,13 @@ void Intepreter::intepret_node(Ast::Exp * node)
 		case OpType::ASSIGN:
 
 		}
+
+		Ast::clearReturnVal(node->left);
+		Ast::clearReturnVal(node->right);
 		break;
 	}
 	case Ast::UNARY:
+		Ast::clearReturnVal(node);
 		break;
 	case Ast::INTEGER:
 		break;
@@ -164,8 +180,76 @@ void Intepreter::intepret_node(Ast::Exp * node)
 	}
 }
 
-void Intepreter::code_block_walk(Ast::Exp * node)
+int Intepreter::code_block_walk(Ast::Exp * node)
 {
+
+	switch (node->expType) {
+	case Ast::FOR: {
+
+		Ast::Exp* ctrl = node->left;
+		post_order_walk(ctrl);
+		if (ctrl->is_int_return) {
+			for (int i = 1; i < ctrl->int_return; i++) {
+				iterate_args(node);
+			}
+		}
+		else {
+			std::cerr << "Intepreter: Expected an integer value at ln:" << node->ln << " col:" << node->col;
+			exit(1);
+		}
+
+		break;
+	}
+
+	case Ast::WHILE: {
+
+		Ast::Exp* condition = node->left;
+		post_order_walk(condition);
+		while (true)
+		{
+			if (condition->is_int_return) {
+				if (condition->int_return == 0) {
+					break;
+				}
+			}
+			else if (condition->is_double_return) {
+				if (condition->double_return == 0) {
+					break;
+				}
+			}
+			else if (condition->is_str_return) {
+				if (condition->str_return == "") {
+					break;
+				}
+			}
+			else if (condition->is_symbolic_return) {
+				//TODO grab the variable table and check variable value
+			}
+
+			if (iterate_args(node) == 1){
+				break;
+			}
+		}
+
+
+	}
+
+	}
+}
+
+int Intepreter::iterate_args(Ast::Exp*node) {
+	//a return value of 1 means exit the current code block
+
+	std::list<Ast::Exp*>* arguments = node->arguments;
+	std::list<Ast::Exp*>::iterator it;
+	for (it = arguments->begin(); it != arguments->end(); it++) {
+		Ast::Exp* e = *it;
+		if (e->expType == Ast::INSTR) {
+			return e->int_attr;
+		}
+		code_block_walk(e);
+	}
+	return 0;
 }
 
 

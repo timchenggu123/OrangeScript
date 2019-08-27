@@ -228,11 +228,32 @@ Ast::Exp * Ast::makeDeclareVar(Exp * assignment, int ln, int col)
 	return e;
 }
 
+Ast::Exp * Ast::makeInstruction(int instruction, int ln, int col)
+{
+	Exp* e = new Exp;
+	e->expType = INSTR;
+	e->opType = NULL;
+	e->parent = nullptr;
+	e->left = nullptr;
+	e->right = nullptr;
+	e->str_attr = "";
+	e->deci_attr = NULL;
+	e->int_attr = instruction;
+	e->is_int_attr = true;
+	e->arguments = nullptr;
+	e->ln = ln;
+	e->col = col;
+	return e;
+}
+
 int Ast::getCodeBlockType(Lexer::Token* token)
 {
 	//Note, when adding a keyword, this method and isCodeBlock method
 	//both need to be changed. 
 	//TODO: complete this list
+	
+	//*Note while this looks similar to key_dict, not all keywords
+	//initiate codeblocks. Thus, we need separate definition.
 
 	if (token->type == Lexer::KEYWORD) {
 		if (token->text == "for") {
@@ -267,6 +288,18 @@ bool Ast::isCodeBlock(Exp * e)
 	}
 
 	return false;
+}
+
+void Ast::clearReturnVal(Exp * node)
+{
+	bool is_str_return = false;
+	bool is_int_return = false;
+	bool is_double_return = false;
+	bool is_symbolic_return = false;
+
+	bool is_str_attr = false;
+	bool is_int_attr = false;
+	bool is_double_attr = false;
 }
 
 

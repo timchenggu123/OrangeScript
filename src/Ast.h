@@ -3,7 +3,7 @@
 #include <list>
 #include <string>
 #include "Lexer.h"
-
+#include <map>
 
 using std::string;
 class Ast
@@ -23,8 +23,10 @@ public:
 		WHILE,
 		IF,
 		PROJECTION,
-		RECORD
+		RECORD,
+		INSTR
 	};
+
 	struct Exp {
 		int expType;
 		int opType;
@@ -65,9 +67,12 @@ public:
 	static Exp* makeIfConditional(Exp* condition, list<Exp*>* args, int ln, int col);
 	static Exp* makeWhileLoop(Exp* condition, list<Exp*>* args, int ln, int col);
 	static Exp* makeDeclareVar(Exp* assignment, int ln, int col);
+	static Exp* makeInstruction(int instruction, int ln, int col);
 	
 	static int getCodeBlockType(Lexer::Token* token);
 	static bool isCodeBlock(Exp* e);
+
+	static void clearReturnVal(Exp* node);
 	//Exp* makeProjectionExp(list<Lexer::Token> tokens); //These are to be implemented in fur
 	//Exp* makeRecordExp(list<Lexer::Token> tokens);
 	Ast();
