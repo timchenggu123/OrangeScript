@@ -55,8 +55,10 @@ void Intepreter::intepret_node(Ast::Exp * node)
 	//TODO:Complete this
 	switch (node->expType) {
 	case Ast::BINARY: {
+
 		switch (node->opType) {
-		case OpType::ADD:
+
+		case OpType::ADD: {
 			if (node->left->is_double_return ||
 				node->right->is_double_return) {
 				node->is_double_return = true;
@@ -64,12 +66,12 @@ void Intepreter::intepret_node(Ast::Exp * node)
 				double val2 = node->right->double_return;
 				node->double_return = val1 + val2;
 			}
-			else if(node->left->is_int_return &&
-					node->right->is_int_return){
+			else if (node->left->is_int_return &&
+				node->right->is_int_return) {
 				node->is_int_return = true;
 				int val1 = node->left->int_return;
 				int val2 = node->right->int_return;
-				node->int_return= val1 + val2;
+				node->int_return = val1 + val2;
 			}
 			else if (node->left->is_str_return &&
 				node->right->is_str_return) {
@@ -84,7 +86,8 @@ void Intepreter::intepret_node(Ast::Exp * node)
 				exit(1);
 			}
 			break;
-		case OpType::SUB:
+		}
+		case OpType::SUB: {
 			if (node->left->is_double_return ||
 				node->right->is_double_return) {
 				node->is_double_return = true;
@@ -105,7 +108,8 @@ void Intepreter::intepret_node(Ast::Exp * node)
 				exit(1);
 			}
 			break;
-		case OpType::MUL:
+		}
+		case OpType::MUL: {
 			if (node->left->is_double_return ||
 				node->right->is_double_return) {
 				node->is_double_return = true;
@@ -126,7 +130,8 @@ void Intepreter::intepret_node(Ast::Exp * node)
 				exit(1);
 			}
 			break;
-		case OpType::DIV:
+		}
+		case OpType::DIV: {
 			if (node->left->is_double_return ||
 				node->right->is_double_return) {
 				node->is_double_return = true;
@@ -150,7 +155,8 @@ void Intepreter::intepret_node(Ast::Exp * node)
 				exit(1);
 			}
 			break;
-		case OpType::MOD:
+		}
+		case OpType::MOD: {
 			if (node->left->is_int_return && node->right->is_int_return) {
 				node->is_int_return = true;
 				int val1 = node->left->int_return;
@@ -158,11 +164,12 @@ void Intepreter::intepret_node(Ast::Exp * node)
 				node->int_return = val1 % val2;
 			}
 			else {
-				std::cerr <<"compiler: Modulus operator requires integer inputs at ln:" << node->ln << " col:" << node->col << std::endl;
+				std::cerr << "compiler: Modulus operator requires integer inputs at ln:" << node->ln << " col:" << node->col << std::endl;
 				exit(1);
 			}
 			break;
-		case OpType::EQ:
+		}
+		case OpType::EQ: {
 			if ((node->left->is_int_return && node->right->is_int_return)) {
 				node->is_int_return = true;
 				int val1 = node->left->int_return;
@@ -173,8 +180,9 @@ void Intepreter::intepret_node(Ast::Exp * node)
 				else {
 					node->int_return = 0;
 				}
-				
-			} else if ((node->left->is_double_return && node->right->is_int_return)) {
+
+			}
+			else if ((node->left->is_double_return && node->right->is_int_return)) {
 				node->is_int_return = true;
 				double val1 = node->left->int_return;
 				int val2 = node->right->int_return;
@@ -212,7 +220,8 @@ void Intepreter::intepret_node(Ast::Exp * node)
 				exit(1);
 			}
 			break;
-		case OpType::NOT_EQ:
+		}
+		case OpType::NOT_EQ: {
 			if ((node->left->is_int_return && node->right->is_int_return)) {
 				node->is_int_return = true;
 				int val1 = node->left->int_return;
@@ -263,11 +272,11 @@ void Intepreter::intepret_node(Ast::Exp * node)
 				exit(1);
 			}
 			break;
-
-		case OpType::L_AND:
+		}
+		case OpType::L_AND: {
 			//we first convert left and right to boolean (int 1 or 0) values
-			node->left->is_int_return == true;
-			node->right->is_int_return == true;
+			node->left->is_int_return = true;
+			node->right->is_int_return = true;
 			if (node->left->is_str_return) {
 				if (node->left->str_return == "") {
 					node->left->int_return = 0;
@@ -319,10 +328,11 @@ void Intepreter::intepret_node(Ast::Exp * node)
 				node->int_return = 0;
 			}
 			break;
-		case OpType::L_OR:
+		}
+		case OpType::L_OR: {
 			//we first convert left and right to boolean (int 1 or 0) values
-			node->left->is_int_return == true;
-			node->right->is_int_return == true;
+			node->left->is_int_return = true;
+			node->right->is_int_return = true;
 			if (node->left->is_str_return) {
 				if (node->left->str_return == "") {
 					node->left->int_return = 0;
@@ -374,10 +384,64 @@ void Intepreter::intepret_node(Ast::Exp * node)
 				node->int_return = 0;
 			}
 			break;
-		case OpType::B_OR:
+		}
+		case OpType::B_OR: {
+			//Binary Operation onlly works on integers and chars (which is also an int in cpp)
+
+			node->is_int_return = true;
+			bool is_left_char = node->left->is_str_return && node->left->str_return.length() == 1;
+			bool is_right_char = node->right->is_str_return && node->right->str_return.length() == 1;
+
+			if ((is_left_char || node->left->is_int_return) &&
+				(is_right_char || node->right->is_int_return)) {
+				//first , if there is any char, we first convert the char to 
+				//int 
+
+				if (is_left_char) {
+					node->left->int_return = static_cast<int>(node->right->str_return[0]);
+				}
+
+				if (is_right_char) {
+					node->left->int_return = static_cast<int>(node->left->str_return[0]);
+				}
+
+				int val1 = node->left->int_return;
+				int val2 = node->right->int_return;
+				node->int_return = val1 | val2;
+			}
+			else {
+				std::cerr << "Compiler: Invalid value for the operation at ln:" << node->ln << " col:" << node->col;
+			}
+
 			break;
-		case OpType::B_AND:
+		}
+		case OpType::B_AND: {
+			node->is_int_return = true;
+			bool is_left_char = node->left->is_str_return && node->left->str_return.length() == 1;
+			bool is_right_char = node->right->is_str_return && node->right->str_return.length() == 1;
+
+			if ((is_left_char || node->left->is_int_return) &&
+				(is_right_char || node->right->is_int_return)) {
+				//first , if there is any char, we first convert the char to 
+				//int 
+
+				if (is_left_char) {
+					node->left->int_return = static_cast<int>(node->right->str_return[0]);
+				}
+
+				if (is_right_char) {
+					node->left->int_return = static_cast<int>(node->left->str_return[0]);
+				}
+
+				int val1 = node->left->int_return;
+				int val2 = node->right->int_return;
+				node->int_return = val1 & val2;
+			}
+			else {
+				std::cerr << "Compiler: Invalid value for the operation at ln:" << node->ln << " col:" << node->col;
+			}
 			break;
+		}
 		case OpType::LT:
 			break;
 		case OpType::GT:
@@ -407,7 +471,7 @@ void Intepreter::intepret_node(Ast::Exp * node)
 		break;
 	case Ast::VARIABLE:
 		break;
-	}
+	}p
 }
 
 int Intepreter::code_block_walk(Ast::Exp * node)

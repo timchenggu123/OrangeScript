@@ -142,7 +142,7 @@ Ast::Exp* Parser::parseExpression(Lexer::Token* token_start, Lexer::Token* token
 	vector<Lexer::Token*> brkt_stk;
 
 	Lexer::Token* pivot;
-	
+
 	//Check to see if the expression is enclosed by brackets. If so, skip
 	if (token_start->next->text == "(" &&
 		token_end->prev->text == ")") {
@@ -155,7 +155,7 @@ Ast::Exp* Parser::parseExpression(Lexer::Token* token_start, Lexer::Token* token
 		return parsePrimaryExpression(token_start->next);
 	}
 
-	while (token ->next != nullptr &&
+	while (token->next != nullptr &&
 		token->next->id != endId) {
 		token = token->next;
 
@@ -164,7 +164,7 @@ Ast::Exp* Parser::parseExpression(Lexer::Token* token_start, Lexer::Token* token
 
 			if (OpType::isBinaryOp(token->opType) &&
 				OpType::getPrecedence(token->opType) > min_precedence
-				) 
+				)
 			{
 				min_precedence = OpType::getPrecedence(token->opType);
 				pivot = token;
@@ -177,9 +177,10 @@ Ast::Exp* Parser::parseExpression(Lexer::Token* token_start, Lexer::Token* token
 				pivot = token;
 				expType = Ast::UNARY;
 			}
-			
 
-		} else if(token->text == "(") {
+
+		}
+		else if (token->text == "(") {
 			brkt_stk.push_back(token);
 
 		}
@@ -207,54 +208,57 @@ Ast::Exp* Parser::parseExpression(Lexer::Token* token_start, Lexer::Token* token
 	}
 
 	if (expType == Ast::BINARY) {
-			Ast::Exp* result = Ast::makeBinaryExp(
-				pivot->opType,parseExpression(token_start, pivot), parseExpression(pivot,token_end),
-				pivot->ln, pivot->col);
-			return result;
+		Ast::Exp* result = Ast::makeBinaryExp(
+			pivot->opType, parseExpression(token_start, pivot), parseExpression(pivot, token_end),
+			pivot->ln, pivot->col);
+		return result;
 	}
 
 	if (expType == Ast::UNARY) {
 		switch (OpType::LeftOrRightAssociate(pivot->opType)) {
-		case OpType::RIGHT_ASSOC:
-			if (pivot->prev->id != startId) {
-				std::cerr << "Parser: Unexpected expression at ln:" << pivot->ln << " col:" <<pivot->col << std::endl;
-				exit(1);
-			}
-			Ast::Exp* result = Ast::makeUnaryExp(
-				pivot->opType, parseExpression(pivot, token_end),
-				pivot->ln, pivot->col
-			);
-			return result;
-
-		case OpType::LEFT_ASSOC:
-			if (pivot->next->id != endId) {
-				std::cerr << "Parser: Unexpected expression at ln:" << pivot->ln << " col:" << pivot->col << std::endl;
-				exit(1);
-			}
-			Ast::Exp* result = Ast::makeUnaryExp(
-				pivot->opType, parseExpression(token_start, pivot),
-				pivot->ln, pivot->col
-			);
-			return result;
-
-		case OpType::INDETERMINATE:
-			if (pivot->prev->id == startId) {
-				Ast::Exp*result = Ast::makeUnaryExp(
+			case OpType::RIGHT_ASSOC: {
+				if (pivot->prev->id != startId) {
+					std::cerr << "Parser: Unexpected expression at ln:" << pivot->ln << " col:" << pivot->col << std::endl;
+					exit(1);
+				}
+				Ast::Exp* result = Ast::makeUnaryExp(
 					pivot->opType, parseExpression(pivot, token_end),
 					pivot->ln, pivot->col
 				);
+				return result;
 			}
-			else if (pivot->next->id == endId) {
+			case OpType::LEFT_ASSOC: {
+				if (pivot->next->id != endId) {
+					std::cerr << "Parser: Unexpected expression at ln:" << pivot->ln << " col:" << pivot->col << std::endl;
+					exit(1);
+				}
 				Ast::Exp* result = Ast::makeUnaryExp(
 					pivot->opType, parseExpression(token_start, pivot),
 					pivot->ln, pivot->col
 				);
+				return result;
 			}
-			else {
-				std::cerr << "Parser: Unexpected expression at ln:" << pivot->ln << " col:" << pivot->col << std::endl;
-				exit(1);
+
+			case OpType::INDETERMINATE:{
+				Ast::Exp* result;
+				if (pivot->prev->id == startId) {
+					result = Ast::makeUnaryExp(
+						pivot->opType, parseExpression(pivot, token_end),
+						pivot->ln, pivot->col
+					);
+				}
+				else if (pivot->next->id == endId) {
+					result = Ast::makeUnaryExp(
+						pivot->opType, parseExpression(token_start, pivot),
+						pivot->ln, pivot->col
+					);
+				}
+				else {
+					std::cerr << "Parser: Unexpected expression at ln:" << pivot->ln << " col:" << pivot->col << std::endl;
+					exit(1);
+				}
+				return result;
 			}
-			return;
 		}
 	}
 	//parse unary expression
