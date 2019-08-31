@@ -147,7 +147,7 @@ OpType::~OpType()
 	return false;
 }
 
- bool OpType::LeftOrRightAssociate(int OpType)
+ int OpType::LeftOrRightAssociate(int OpType)
  {
 	 switch (OpType) {
 	 case L_NOT:

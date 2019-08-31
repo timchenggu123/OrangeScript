@@ -1,6 +1,7 @@
 #include "Intepreter.h"
 #include "Ast.h"
-Intepreter::Intepreter()
+Intepreter::Intepreter() :
+	_registry(new Registry())
 {
 }
 
@@ -29,10 +30,11 @@ int Intepreter::getInstructionType(std::string label)
 	return -999;
 }
 
-int Intepreter::post_order_walk(Ast::Exp * node)
+void Intepreter::post_order_walk(Ast::Exp * node)
 {
+
 	if (Ast::isCodeBlock(node)) {
-		return code_block_walk(node);
+		 code_block_walk(node);
 	}
 	else if (node->left == nullptr &&
 		node->right == nullptr) {
@@ -47,7 +49,6 @@ int Intepreter::post_order_walk(Ast::Exp * node)
 		post_order_walk(node->left);
 		intepret_node(node);
 	}
-	return 0;
 }
 
 void Intepreter::intepret_node(Ast::Exp * node)
@@ -398,11 +399,11 @@ void Intepreter::intepret_node(Ast::Exp * node)
 				//int 
 
 				if (is_left_char) {
-					node->left->int_return = static_cast<int>(node->right->str_return[0]);
+					node->left->int_return = node->right->str_return[0];
 				}
 
 				if (is_right_char) {
-					node->left->int_return = static_cast<int>(node->left->str_return[0]);
+					node->left->int_return = node->left->str_return[0];
 				}
 
 				int val1 = node->left->int_return;
@@ -426,11 +427,11 @@ void Intepreter::intepret_node(Ast::Exp * node)
 				//int 
 
 				if (is_left_char) {
-					node->left->int_return = static_cast<int>(node->right->str_return[0]);
+					node->left->int_return = node->right->str_return[0];
 				}
 
 				if (is_right_char) {
-					node->left->int_return = static_cast<int>(node->left->str_return[0]);
+					node->left->int_return = node->left->str_return[0];
 				}
 
 				int val1 = node->left->int_return;
@@ -470,37 +471,95 @@ void Intepreter::intepret_node(Ast::Exp * node)
 	case Ast::STRING:
 		break;
 	case Ast::VARIABLE:
+		// if the variable is of the 3 basic data types (int, double or string) we just decay it as one of the 3 data types.
+		//TODO add other dataTypes;
+
+		std::string label = node->str_attr;
+		
+		
 		break;
-	}p
+	}
 }
 
-int Intepreter::code_block_walk(Ast::Exp * node)
+void Intepreter::code_block_walk(Ast::Exp * node)
 {
 
 	switch (node->expType) {
-	case Ast::FOR: {
+		case Ast::FOR: {
 
-		Ast::Exp* ctrl = node->left;
-		post_order_walk(ctrl);
-		if (ctrl->is_int_return) {
-			for (int i = 1; i < ctrl->int_return; i++) {
-				iterate_args(node);
+			Ast::Exp* ctrl = node->left;
+			post_order_walk(ctrl);
+			if (ctrl->is_int_return) {
+				for (int i = 1; i < ctrl->int_return; i++) {
+					_registry->new_child_scope();
+
+					int instruction = execute_args(node);
+					if ( instruction == BREAK) {
+						break;
+					}
+					else if (instruction == CONTINUE){
+						continue;
+					}
+
+					_registry->destroy_child_scope();
+				}
 			}
+			else {
+				std::cerr << "Intepreter: Expected an integer value at ln:" << node->ln << " col:" << node->col;
+				exit(1);
+			}
+
+			break;
 		}
-		else {
-			std::cerr << "Intepreter: Expected an integer value at ln:" << node->ln << " col:" << node->col;
-			exit(1);
+
+		case Ast::WHILE: {
+
+			Ast::Exp* condition = node->left;
+			post_order_walk(condition);
+			while (true)
+			{
+				if (condition->is_int_return) {
+					if (condition->int_return == 0) {
+						break;
+					}
+				}
+				else if (condition->is_double_return) {
+					if (condition->double_return == 0) {
+						break;
+					}
+				}
+				else if (condition->is_str_return) {
+					if (condition->str_return == "") {
+						break;
+					}
+				}
+				else if (condition->is_symbolic_return) {
+					//TODO grab the variable table and check variable value
+				}
+
+				//TODO: might need to expnd this
+
+				_registry->new_child_scope();
+
+				int instruction = execute_args(node);
+				if (instruction == BREAK) {
+					break;
+				}
+				else if (instruction == CONTINUE) {
+					continue;
+				}
+
+				_registry->destroy_child_scope();
+
+				
+			}
+
+			break;
 		}
 
-		break;
-	}
-
-	case Ast::WHILE: {
-
-		Ast::Exp* condition = node->left;
-		post_order_walk(condition);
-		while (true)
-		{
+		case Ast::IF: {
+			Ast::Exp* condition = node->left;
+			post_order_walk(condition);
 			if (condition->is_int_return) {
 				if (condition->int_return == 0) {
 					break;
@@ -519,24 +578,31 @@ int Intepreter::code_block_walk(Ast::Exp * node)
 			else if (condition->is_symbolic_return) {
 				//TODO grab the variable table and check variable value
 			}
+			
 
-			//TODO: might need to expnd this
-			if (iterate_args(node) == BREAK){
-				break;
-			}
-			else if (iterate_args(node) == CONTINUE) {
-				continue;
-			}
+			_registry->new_child_scope();
 
+			execute_args(node);
+
+			_registry->destroy_child_scope();
+
+			break;
 		}
 
+		case Ast::CODE_BLK: {
+			_registry->new_child_scope();
 
-	}
+			execute_args(node);
+
+			_registry->destroy_child_scope();
+
+			break;
+		}
 
 	}
 }
 
-int Intepreter::iterate_args(Ast::Exp*node) {
+int Intepreter::execute_args(Ast::Exp*node) {
 	//a return value of 1 means exit the current code block
 
 	std::list<Ast::Exp*>* arguments = node->arguments;

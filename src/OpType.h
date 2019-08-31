@@ -45,7 +45,7 @@ public:
 	static  int getOpType(string op);
 	static  bool isBinaryOp(int opType);
 	static  bool isUnaryOp(int opType);
-	static  bool LeftOrRightAssociate(int OpType);
+	static  int LeftOrRightAssociate(int OpType);
 };
 
 #endif
