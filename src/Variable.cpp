@@ -5,6 +5,10 @@ void Variable::_setLabel(std::string label)
 	_label = label;
 }
 
+Variable::~Variable()
+{
+}
+
 bool Variable::_getBoolVal()
 {
 	return _bool_val;
@@ -15,6 +19,11 @@ int Variable::_getBinVal()
 	return _bin_val;
 }
 
+int Variable::_getType()
+{
+	return _dataType;
+}
+
 Integer::Integer(int val, std::string label) :
 	_val(val)
 {
@@ -22,6 +31,16 @@ Integer::Integer(int val, std::string label) :
 	_setBoolVal();
 	_setBinVal();
 	_setDataType();
+}
+
+int Integer::getVal()
+{
+	return _val;
+}
+
+void Integer::setVal(int val)
+{
+	_val = val;
 }
 
 
@@ -48,6 +67,16 @@ String::String(std::string val, std::string label) :
 	_setBoolVal();
 	_setBinVal();
 	_setDataType();
+}
+
+std::string String::getVal()
+{
+	return _val;
+}
+
+void String::setVal(std::string val)
+{
+	_val = val;
 }
 
 void String::_setBoolVal()
@@ -78,6 +107,16 @@ Decimal::Decimal(double val, std::string label) :
 	_setBoolVal();
 	_setBinVal();
 	_setDataType();
+}
+
+double Decimal::getVal()
+{
+	return _val;
+}
+
+void Decimal::setVal(double val)
+{
+	_val = val;
 }
 
 void Decimal::_setBoolVal()

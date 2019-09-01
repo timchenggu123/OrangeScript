@@ -1,15 +1,15 @@
-#ifndef  INTEPRETER_H
-#define INTEPRETER
+#ifndef  INTERPRETER_H
+#define INTERPRETER_H
 #include <map>
 #include "Parser.h"
 #include "Ast.h"
 #include "Variable.h"
 #include "Registry.h"
-class Intepreter
+class Interpreter
 {
 public:
-	Intepreter();
-	~Intepreter();
+	Interpreter();
+	~Interpreter();
 	enum Instructions {
 		NULL_INSTR,
 		BREAK,
@@ -19,7 +19,7 @@ public:
 	static int getInstructionType(std::string label);
 private:
 	void post_order_walk(Ast::Exp* node);
-	void intepret_node(Ast::Exp*node);
+	void interpret_node(Ast::Exp* node);
 	void code_block_walk(Ast::Exp* node);
 	int execute_args(Ast::Exp * node);
 	Registry* _registry;

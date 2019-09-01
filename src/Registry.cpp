@@ -2,7 +2,8 @@
 
 Registry::Registry() :
 	LUT_stack(new std::list < std::map<std::string, Variable*>*>),
-	LUT_cache(new std::map<std::string, Variable*>)
+	LUT_cache(new std::map<std::string, Variable*>()),
+	LUT_cache_precedence(new std::map<std::string, int>())
 {
 
 }
@@ -25,22 +26,36 @@ void Registry::destroy_child_scope()
 	std::map<std::string, Variable*>* child = LUT_stack->back();
 	LUT_stack->pop_back();
 
+	if (LUT_cache->size() != 0) {
+		std::map<std::string, Variable*>::iterator it;
+		std::list<std::string>* list_to_delete = new std::list<string>;
+		for (it = LUT_cache->begin(); it != LUT_cache->end(); it++) {
+			//we loop through cache and check to see if it exists in child
+			//If so, add to list_to_be_deleted;
+			if (child->count(it->first) != 0) {
+				list_to_delete->push_back(it->first);
+			}
+		}
+		std::list<std::string>::iterator it1;
+		for (it1 = list_to_delete->begin(); it1 != list_to_delete->end(); it1++) {
+			LUT_cache->erase(*it1);
+			LUT_cache_precedence->erase(*it1);
+		}
+
+		delete list_to_delete;
+	}
 	//we first clear the cache entries that are now out of scope
-	std::map<std::string, Variable*>::iterator it1;
-	for (it1 = LUT_cache->begin(); it1 != LUT_cache->end(); it1++) {
-		if (child->count(it1->first) != 0) {
-			LUT_cache->erase(it1->first);
-			LUT_cache_precedence->erase(it1->first);
+
+	//we now delete the variable pointers in the actual map
+	if (child->size() != 0) {
+		std::map<std::string, Variable*>::iterator it;
+		for (it = child->begin(); it != child->end(); it++)
+		{
+			delete it->second;
+			it->second = nullptr;
 		}
 	}
 
-	//we now delete the variable pointers in the actual map
-	std::map<std::string, Variable*>::iterator it;
-	for (it = child->begin(); it != child->end(); it++)
-	{
-		delete it->second;
-		it->second = nullptr;
-	}
 	delete child;
 
 }
@@ -68,16 +83,23 @@ Variable* Registry::getVariable(std::string label)
 
 bool Registry::registerVariable(std::string label, Variable * variable)
 {
-	if (getVariable(label) != nullptr) {
-		std::map<std::string, Variable*>* current_scope = LUT_stack->back();
-		current_scope->insert(std::pair < std::string, Variable*>(label, variable));
-		return true;
+	//this function registers new variables. we first search to see if the 
+	//label has already been registered. If it has, then we will delete the old variable pointer
+	//and replace it with the new one. The function will return false this case. 
+	//If the label has not been registered, we simply register the label and the 
+	//variable pointer. The function will return true in this case. 
+
+	Variable* exist = getVariable(label);
+	if (exist != nullptr) {
+		delete exist;
 	}
-	else {
-		return false;
-	}
-	
+	std::map<std::string, Variable*>* current_scope = LUT_stack->back();
+	current_scope->insert(std::pair < std::string, Variable*>(label, variable));
+	addToCache(label, variable);
+		
+	return exist == nullptr ? true: false;
 }
+
 
 Variable* Registry::searchCache(std::string label)
 {

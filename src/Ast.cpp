@@ -28,7 +28,7 @@ Ast::Exp * Ast::makeIntegerExp(int i, int ln, int col)
 	e->left = nullptr;
 	e->right = nullptr;
 	e->str_attr = "";
-	e->deci_attr = NULL;
+	e->double_attr = NULL;
 	e->int_attr = i;
 	e->arguments = nullptr;
 	e->is_int_attr = true;
@@ -52,7 +52,7 @@ Ast::Exp * Ast::makeDecimalExp(string s, int ln, int col)
 	e->left = nullptr;
 	e->right = nullptr;
 	e->str_attr = "";
-	e->deci_attr = num;
+	e->double_attr = num;
 	e->int_attr = NULL;
 	e->arguments = nullptr;
 	e->is_double_attr = true;
@@ -87,7 +87,7 @@ Ast::Exp * Ast::makeVariableExp(string s, int ln, int col)
 	e->left = nullptr;
 	e->right = nullptr;
 	e->str_attr = s;
-	e->deci_attr = NULL;
+	e->double_attr = NULL;
 	e->int_attr = NULL;
 	e->arguments = nullptr;
 	e->is_symbolic_return = true;
@@ -106,7 +106,7 @@ Ast::Exp * Ast::makeUnaryExp(int opType, Exp * l, int ln, int col)
 	e->right = nullptr;
 	e->str_attr = "";
 	e->int_attr = NULL;
-	e->deci_attr = NULL;
+	e->double_attr = NULL;
 	e->arguments = nullptr;
 	e->ln = ln;
 	e->col = col;
@@ -122,7 +122,7 @@ Ast::Exp * Ast::makeBinaryExp(int opType, Exp * l, Exp * r, int ln, int col)
 	e->left = l;
 	e->right = r;
 	e->str_attr = "";
-	e->deci_attr = NULL;
+	e->double_attr = NULL;
 	e->int_attr = NULL;
 	e->arguments = nullptr;
 	e->ln = ln;
@@ -139,7 +139,7 @@ Ast::Exp * Ast::makeCallExp(string name, list<Exp*>* args, int ln, int col)
 	e->left = nullptr;
 	e->right = nullptr;
 	e->str_attr = name;
-	e->deci_attr = NULL;
+	e->double_attr = NULL;
 	e->int_attr = NULL;
 	e->arguments = args;
 	e->ln = ln;
@@ -156,7 +156,7 @@ Ast::Exp* Ast::makeCodeBlock(list<Exp*>* args, int ln, int col){
 	e->right = nullptr;
 	e->str_attr = "";
 	e->int_attr = NULL;
-	e->deci_attr = NULL;
+	e->double_attr = NULL;
 	e->arguments = args;
 	e->ln = ln;
 	e->col = col;
@@ -171,7 +171,7 @@ Ast::Exp* Ast::makeForLoop(Exp*control,list<Exp*>* args, int ln, int col){
 	e->left = control;
 	e->right = nullptr;
 	e->str_attr = "";
-	e->deci_attr = NULL;
+	e->double_attr = NULL;
 	e->int_attr = NULL;
 	e->arguments = args;
 	e->ln = ln;
@@ -187,7 +187,7 @@ Ast::Exp* Ast::makeIfConditional(Exp*condition,list<Exp*>* args, int ln, int col
 	e->left = condition;
 	e->right = nullptr;
 	e->str_attr = "";
-	e->deci_attr = NULL;
+	e->double_attr = NULL;
 	e->int_attr = NULL;
 	e->arguments = args;
 	e->ln = ln;
@@ -203,7 +203,7 @@ Ast::Exp* Ast::makeWhileLoop(Exp*condition,list<Exp*>* args, int ln, int col){
 	e->left = condition;
 	e->right = nullptr;
 	e->str_attr = "";
-	e->deci_attr = NULL;
+	e->double_attr = NULL;
 	e->int_attr = NULL;
 	e->arguments = args;
 	e->ln = ln;
@@ -220,7 +220,7 @@ Ast::Exp * Ast::makeDeclareVar(Exp * assignment, int ln, int col)
 	e->left = assignment;
 	e->right = nullptr;
 	e->str_attr = "";
-	e->deci_attr = NULL;
+	e->double_attr = NULL;
 	e->int_attr = NULL;
 	e->arguments = nullptr;
 	e->ln = ln;
@@ -237,7 +237,7 @@ Ast::Exp * Ast::makeInstruction(int instruction, int ln, int col)
 	e->left = nullptr;
 	e->right = nullptr;
 	e->str_attr = "";
-	e->deci_attr = NULL;
+	e->double_attr = NULL;
 	e->int_attr = instruction;
 	e->is_int_attr = true;
 	e->arguments = nullptr;
@@ -251,7 +251,7 @@ int Ast::getCodeBlockType(Lexer::Token* token)
 	//Note, when adding a keyword, this method and isCodeBlock method
 	//both need to be changed. 
 	//TODO: complete this list
-	
+
 	//*Note while this looks similar to key_dict, not all keywords
 	//initiate codeblocks. Thus, we need separate definition.
 
@@ -268,13 +268,9 @@ int Ast::getCodeBlockType(Lexer::Token* token)
 		else if (token->text == "end") {
 			return -999;
 		}
-		else if (token->text == "var") {
-			return DECLARE;
-		}
 	}
-	else {
-		return -1;
-	}
+
+	return -1;
 }
 
 bool Ast::isCodeBlock(Exp * e)
@@ -283,7 +279,7 @@ bool Ast::isCodeBlock(Exp * e)
 	case FOR:
 	case WHILE:
 	case IF:
-	case DECLARE:
+	case CODE_BLK:
 		return true;
 	}
 

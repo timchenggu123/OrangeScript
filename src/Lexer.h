@@ -44,7 +44,8 @@ public:
 		"if",
 		"else",
 		"elseif",
-		"end"
+		"end",
+		"print"
 	};
 
 	Lexer();

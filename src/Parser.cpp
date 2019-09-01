@@ -63,8 +63,10 @@ void Parser::scan(list<Lexer::Token*> *tokens, Ast* ast)
 				//we have found a keyword in the current statement
 				//intializing a new code block.
 				
-				//we push the current codeblock on stack.
+				//we save the current codeblock on stack.
+				//then initialize a new one.
 				parseStack.push_back(currentCodeBlock);
+
 				//TODO: complete list of possible begin-statement keywords.
 				if(codeBlockType == Ast::FOR)
 				{
@@ -84,14 +86,8 @@ void Parser::scan(list<Lexer::Token*> *tokens, Ast* ast)
 				{
 					args = new list<Ast::Exp*>;
 					Ast::Exp* condition = parseExpression(token_start->next, token);
-					Ast::Exp* ifConditional = Ast::makeIfConditional(condition, args,token->ln, token->col);
+					Ast::Exp* ifConditional = Ast::makeIfConditional(condition, args, token->ln, token->col);
 					currentCodeBlock = ifConditional;
-				}
-				else if (codeBlockType == Ast::DECLARE) {
-					args = new list<Ast::Exp*>;
-					Ast::Exp* assignment = parseExpression(token_start->next, token);
-					Ast::Exp* declareVar = Ast::makeDeclareVar(assignment, token->ln, token->col);
-					currentCodeBlock = declareVar;
 				}
 				else{
 					//This should theoretically never be called
@@ -153,6 +149,16 @@ Ast::Exp* Parser::parseExpression(Lexer::Token* token_start, Lexer::Token* token
 	//primary expression. 
 	if (endId - startId == 2) {
 		return parsePrimaryExpression(token_start->next);
+	}
+
+	//check to see if our expression starts with a keyword
+	if (token_start->next->type == Lexer::KEYWORD) {
+		std::string keyword = token_start->next->text;
+		if (keyword == "print") {
+			std::list<Ast::Exp*>* args = new std::list<Ast::Exp*>();
+			args->push_back(parseExpression(token_start->next, token_end));
+			return Ast::makeCallExp("_print", args, token->next->ln, token->next->col);
+		}
 	}
 
 	while (token->next != nullptr &&
@@ -291,11 +297,11 @@ Ast::Exp* Parser::parsePrimaryExpression(Lexer::Token* token) {
 		return Ast::makeStringExp(token->text, token->ln, token->col);
 	}
 	else if (token->type == Lexer::KEYWORD) {
-		int instr = Intepreter::getInstructionType(token->text);
+		int instr = Interpreter::getInstructionType(token->text);
 		if (instr == -999) {
 			std::cerr << "Parser: Invalid instruction at ln:" << token->ln << " col" << token->col;
 		}
-		return Ast::makeInstruction(Intepreter::getInstructionType(token->text),
+		return Ast::makeInstruction(Interpreter::getInstructionType(token->text),
 			token->ln, token->col);
 	}
 	else {

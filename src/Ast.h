@@ -10,6 +10,7 @@ class Ast
 {
 public:
 	enum ExpType {
+		NULL_TYPE,
 		INTEGER,
 		DECLARE,
 		DECIMAL,
@@ -24,7 +25,8 @@ public:
 		IF,
 		PROJECTION,
 		RECORD,
-		INSTR
+		INSTR,
+		PRINT
 	};
 
 	struct Exp {
@@ -35,7 +37,7 @@ public:
 		Exp* right;
 		string str_attr;
 		int int_attr;
-		double deci_attr;
+		double double_attr;
 		list<Exp*>* arguments;
 
 		string str_return;

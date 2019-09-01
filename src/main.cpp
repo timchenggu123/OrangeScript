@@ -6,6 +6,7 @@
 #include "Lexer.h"
 #include "Ast.h"
 #include "Parser.h"
+#include "Interpreter.h"
 
 using std::string;
 using std::cout;
@@ -33,7 +34,7 @@ int main (int argc, char *argv[]){
 	buffer << inputFile.rdbuf();
 	string inputText(buffer.str());
 	inputFile.close();
-
+	
 	cout << endl;
 
 	Lexer* lexer = new Lexer();
@@ -43,6 +44,8 @@ int main (int argc, char *argv[]){
 	Ast* ast = new Ast();
 	Parser* parser = new Parser();
 	parser->scan(tokenList, ast);
+	Interpreter* itrprtr = new Interpreter();
+	itrprtr->execute(ast->getRoot());
 
 	system("pause");
     return 0;
