@@ -26,7 +26,8 @@ public:
 		PROJECTION,
 		RECORD,
 		INSTR,
-		PRINT
+		PRINT,
+		FUNCTION
 	};
 
 	struct Exp {
@@ -63,13 +64,14 @@ public:
 	static Exp* makeVariableExp(string s, int ln, int col);
 	static Exp* makeUnaryExp(int opType, Exp* l, int ln, int col);
 	static Exp* makeBinaryExp(int opType, Exp* l, Exp* r, int ln, int col);
-	static Exp* makeCallExp(string name, list<Exp*>* args, int ln, int col);
+	static Exp* makeCallExp(Ast::Exp* label, list<Exp*>* args, int ln, int col);
 	static Exp* makeCodeBlock(list<Exp*>* args, int ln, int col);
 	static Exp* makeForLoop(Exp* control, list<Exp*>* args, int ln, int col);
 	static Exp* makeIfConditional(Exp* condition, list<Exp*>* args, int ln, int col);
 	static Exp* makeWhileLoop(Exp* condition, list<Exp*>* args, int ln, int col);
 	static Exp* makeDeclareVar(Exp* assignment, int ln, int col);
 	static Exp* makeInstruction(int instruction, int ln, int col);
+	static Exp* makeFunction(std::string label, list<Exp*>* params, Exp* codeBlock, int ln, int col);
 	
 	static int getCodeBlockType(Lexer::Token* token);
 	static bool isCodeBlock(Exp* e);

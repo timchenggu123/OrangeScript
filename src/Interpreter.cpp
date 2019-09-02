@@ -2,6 +2,7 @@
 #include "Ast.h"
 Interpreter::Interpreter() :
 	_registry(new Registry())
+	
 {
 }
 
@@ -9,13 +10,13 @@ Interpreter::~Interpreter()
 {
 }
 
-void Interpreter::execute(Ast::Exp * root)
+void Interpreter::execute(Ast::Exp * root, FunRegistry* fun_registry)
 {
 	if (root->expType != Ast::CODE_BLK) {
 		std::cerr << "Intepreter: no code block at root node";
 		exit(0);
 	}
-
+	_fun_registry = fun_registry;
 	post_order_walk(root);
 }
 
@@ -443,14 +444,219 @@ void Interpreter::interpret_node(Ast::Exp * node)
 				}
 				break;
 			}
-			case OpType::LT:
+			case OpType::LT:{	
+				if ((node->left->is_int_return && node->right->is_int_return)) {
+					node->is_int_return = true;
+					int val1 = node->left->int_return;
+					int val2 = node->right->int_return;
+					if (val1 < val2) {
+						node->int_return = 1;
+					}
+					else {
+						node->int_return = 0;
+					}
+
+				}
+				else if ((node->left->is_double_return && node->right->is_int_return)) {
+					node->is_int_return = true;
+					double val1 = node->left->int_return;
+					int val2 = node->right->int_return;
+					if (val1 < val2) {
+						node->int_return = 1;
+					}
+					else {
+						node->int_return = 0;
+					}
+				}
+				else if ((node->left->is_double_return && node->right->is_double_return)) {
+					node->is_int_return = true;
+					double val1 = node->left->int_return;
+					double val2 = node->right->int_return;
+					if (val1 < val2) {
+						node->int_return = 1;
+					}
+					else {
+						node->int_return = 0;
+					}
+				}
+				else if ((node->left->is_int_return && node->right->is_double_return)) {
+					node->is_int_return = true;
+					int val1 = node->left->int_return;
+					double val2 = node->right->int_return;
+					if (val1 < val2) {
+						node->int_return = 1;
+					}
+					else {
+						node->int_return = 0;
+					}
+				}
+				else {
+					std::cerr << "Compiler: Invalid value for the operation at ln:" << node->ln << " col:" << node->col << std::endl;
+					exit(1);
+				}
 				break;
+
+			}
+			
 			case OpType::GT:
-				break;
+			{				
+				if ((node->left->is_int_return && node->right->is_int_return)) {
+				node->is_int_return = true;
+				int val1 = node->left->int_return;
+				int val2 = node->right->int_return;
+				if (val1 > val2) {
+					node->int_return = 1;
+				}
+				else {
+					node->int_return = 0;
+				}
+
+			}
+			else if ((node->left->is_double_return && node->right->is_int_return)) {
+				node->is_int_return = true;
+				double val1 = node->left->int_return;
+				int val2 = node->right->int_return;
+				if (val1 > val2) {
+					node->int_return = 1;
+				}
+				else {
+					node->int_return = 0;
+				}
+			}
+			else if ((node->left->is_double_return && node->right->is_double_return)) {
+				node->is_int_return = true;
+				double val1 = node->left->int_return;
+				double val2 = node->right->int_return;
+				if (val1 > val2) {
+					node->int_return = 1;
+				}
+				else {
+					node->int_return = 0;
+				}
+			}
+			else if ((node->left->is_int_return && node->right->is_double_return)) {
+				node->is_int_return = true;
+				int val1 = node->left->int_return;
+				double val2 = node->right->int_return;
+				if (val1 > val2) {
+					node->int_return = 1;
+				}
+				else {
+					node->int_return = 0;
+				}
+			}
+			else {
+				std::cerr << "Compiler: Invalid value for the operation at ln:" << node->ln << " col:" << node->col << std::endl;
+				exit(1);
+			}
+			break; 
+			}
 			case OpType::LTE:
+			{
+				if ((node->left->is_int_return && node->right->is_int_return)) {
+					node->is_int_return = true;
+					int val1 = node->left->int_return;
+					int val2 = node->right->int_return;
+					if (val1 <= val2) {
+						node->int_return = 1;
+					}
+					else {
+						node->int_return = 0;
+					}
+
+				}
+				else if ((node->left->is_double_return && node->right->is_int_return)) {
+					node->is_int_return = true;
+					double val1 = node->left->int_return;
+					int val2 = node->right->int_return;
+					if (val1 <= val2) {
+						node->int_return = 1;
+					}
+					else {
+						node->int_return = 0;
+					}
+				}
+				else if ((node->left->is_double_return && node->right->is_double_return)) {
+					node->is_int_return = true;
+					double val1 = node->left->int_return;
+					double val2 = node->right->int_return;
+					if (val1 <= val2) {
+						node->int_return = 1;
+					}
+					else {
+						node->int_return = 0;
+					}
+				}
+				else if ((node->left->is_int_return && node->right->is_double_return)) {
+					node->is_int_return = true;
+					int val1 = node->left->int_return;
+					double val2 = node->right->int_return;
+					if (val1 <= val2) {
+						node->int_return = 1;
+					}
+					else {
+						node->int_return = 0;
+					}
+				}
+				else {
+					std::cerr << "Compiler: Invalid value for the operation at ln:" << node->ln << " col:" << node->col << std::endl;
+					exit(1);
+				}
 				break;
+			}
 			case OpType::GTE:
+			{
+				if ((node->left->is_int_return && node->right->is_int_return)) {
+					node->is_int_return = true;
+					int val1 = node->left->int_return;
+					int val2 = node->right->int_return;
+					if (val1 >= val2) {
+						node->int_return = 1;
+					}
+					else {
+						node->int_return = 0;
+					}
+
+				}
+				else if ((node->left->is_double_return && node->right->is_int_return)) {
+					node->is_int_return = true;
+					double val1 = node->left->int_return;
+					int val2 = node->right->int_return;
+					if (val1 >= val2) {
+						node->int_return = 1;
+					}
+					else {
+						node->int_return = 0;
+					}
+				}
+				else if ((node->left->is_double_return && node->right->is_double_return)) {
+					node->is_int_return = true;
+					double val1 = node->left->int_return;
+					double val2 = node->right->int_return;
+					if (val1 >= val2) {
+						node->int_return = 1;
+					}
+					else {
+						node->int_return = 0;
+					}
+				}
+				else if ((node->left->is_int_return && node->right->is_double_return)) {
+					node->is_int_return = true;
+					int val1 = node->left->int_return;
+					double val2 = node->right->int_return;
+					if (val1 >= val2) {
+						node->int_return = 1;
+					}
+					else {
+						node->int_return = 0;
+					}
+				}
+				else {
+					std::cerr << "Compiler: Invalid value for the operation at ln:" << node->ln << " col:" << node->col << std::endl;
+					exit(1);
+				}
 				break;
+			}
 			case OpType::ASSIGN: {
 				if (!node->left->is_symbolic_return) {
 					std::cerr << "Compiler: Assignment operation requires a symbolic variable on the left hand side at ln:" << node->ln << " col:" << node->col;
@@ -538,6 +744,7 @@ void Interpreter::interpret_node(Ast::Exp * node)
 			break;
 		}
 		case Ast::UNARY:
+			//TODO:complete this
 			Ast::clearReturnVal(node->left);
 			break;
 		case Ast::CALL: {
@@ -557,6 +764,19 @@ void Interpreter::interpret_node(Ast::Exp * node)
 					std::cout << arg->str_return << std::endl;
 				}
 			}
+			else {
+				Ast::Exp* fun = _fun_registry->getFunction(node->left->str_attr);
+				
+				if (node->arguments->size() != fun->arguments->size()) {
+					std::cerr << "Compiler: size of arugments mismatch at ln:" << node->ln << " col:" << node->col;
+				}
+				else {
+					runFunction(fun, node);
+				}
+
+			}
+
+
 			break;
 		}
 		case Ast::INTEGER:
@@ -746,6 +966,55 @@ int Interpreter::execute_args(Ast::Exp*node) {
 		post_order_walk(e);
 	}
 	return 0;
+}
+
+void Interpreter::runFunction(Ast::Exp * function, Ast::Exp * node)
+{
+	//we temporarily save the current registry and initialize a new independent registry 
+	//for the function
+	Registry* temp = _registry;
+	_registry = new Registry();
+	_registry->new_child_scope();
+
+	//Declaring and initializing parameters
+	std::list<Ast::Exp*>::iterator it1 = function->arguments->begin();
+	std::list<Ast::Exp*>::iterator it2 = node->arguments->begin();
+	for (; it1 != function->arguments->end() && it2 != function->arguments->end(); it1++, it2++) {
+		Ast::Exp* param = *it1;
+		Ast::Exp* val = *it2;
+		post_order_walk(val);
+
+
+		if (val->is_double_return) {
+			Variable* x = new Decimal(val->double_return, param->str_attr);
+			_registry->registerVariable(param->str_attr, x);
+
+		}
+		else if (val->is_int_return) {
+
+			Variable* x = new Integer(val->int_return, param->str_attr);
+			_registry->registerVariable(param->str_attr, x);
+			int abc = 1;
+
+		}
+		else if (val->is_str_return) {
+			Variable* x = new String(val->str_return, param->str_attr);
+			_registry->registerVariable(param->str_attr, x);
+		}
+		else if (val->is_symbolic_return) {
+			//TODO: complete symbolic assignment that is not of the 3 basic types. 
+		}
+
+	}
+
+	//the codeBlock containing the function body is stored in the left
+	execute_args(function->left);
+
+	//we now destory the function registry and set the _registry pointer
+	//to point back to the main registry
+	_registry->destroy_child_scope();
+	delete _registry;
+	_registry = temp;
 }
 
 

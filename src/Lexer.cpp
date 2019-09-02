@@ -158,6 +158,10 @@ list<Lexer::Token*>* Lexer::run(string inputText) {
 				buffer = "";
 				ignore_nl = false;
 			}
+			else if (isdelimiter(buffer)) {
+				makeToken(returnObject, buffer, Tokens::DELIMITER);
+				buffer = "";
+			}
 			else if (buffer.length() != 0) {
 				//TODO show more details 
 				cerr << "illegal input:" << buffer << endl;
@@ -282,6 +286,16 @@ bool Lexer::isGrouper_2(string buffer)
 	}
 
 	return true;
+}
+
+bool Lexer::isdelimiter(string buffer)
+{
+	if (buffer.length()== 1){
+		if (buffer[0] == ',') {
+			return true;
+		}
+	}
+	return false;
 }
 
 bool Lexer::checkNewLine(char c){

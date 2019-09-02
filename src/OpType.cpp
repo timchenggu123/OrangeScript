@@ -132,6 +132,7 @@ OpType::~OpType()
 	case LTE:
 	case GTE:
 	case ASSIGN:
+	case FUN_CALL:
 		return true;
 	}
 	return 0;

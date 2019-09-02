@@ -13,6 +13,8 @@ Registry::~Registry()
 	//TODO: needs to check to see if the stack is empty
 	//if not, there might be a risk of memory leak
 	delete LUT_stack;
+	delete LUT_cache;
+	delete LUT_cache_precedence;
 }
 
 void Registry::new_child_scope()

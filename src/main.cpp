@@ -43,7 +43,7 @@ int main (int argc, char *argv[]){
 	
 	Ast* ast = new Ast();
 	Parser* parser = new Parser();
-	parser->scan(tokenList, ast);
+	parser->parse(tokenList, ast);
 	Interpreter* itrprtr = new Interpreter();
 	itrprtr->execute(ast->getRoot());
 

@@ -5,7 +5,7 @@
 #include "Parser.h"
 #include "Lexer.h"
 #include "Ast.h"
-#include "Intepreter.h"
+#include "Interpreter.h"
 
 
 Parser::Parser()
@@ -17,7 +17,7 @@ Parser::~Parser()
 }
 
 
-void Parser::scan(list<Lexer::Token*> *tokens, Ast* ast)
+void Parser::parse(list<Lexer::Token*> *tokens, Ast* ast, FunRegistry* fun_registry)
 {	
 	if (tokens == nullptr) {
 		//TODO throw error
@@ -29,7 +29,7 @@ void Parser::scan(list<Lexer::Token*> *tokens, Ast* ast)
 	std::vector<Ast::Exp*> parseStack;
 
 	//initialize a new code block as rootNode
-	list<Ast::Exp*>*args = new list<Ast::Exp*>;
+	list<Ast::Exp*>*args = new list<Ast::Exp*>; //this is just temporary holder for args
 	Ast::Exp* rootNode = Ast::makeCodeBlock(args,0,0);
 	
 	//initialize variables for scan
@@ -88,6 +88,43 @@ void Parser::scan(list<Lexer::Token*> *tokens, Ast* ast)
 					Ast::Exp* condition = parseExpression(token_start->next, token);
 					Ast::Exp* ifConditional = Ast::makeIfConditional(condition, args, token->ln, token->col);
 					currentCodeBlock = ifConditional;
+				}
+				else if (codeBlockType == Ast::FUNCTION) {
+					std::list<Ast::Exp*>* params = new list<Ast::Exp*>;
+					std::string label = token_start->next->next->text;
+
+					//fist, we parse a list of parameters
+					if (token_start->next->next->next->text == "(") { // next->next->next corresponds to keyword -> label -> left parenthesis
+						Lexer::Token* temp_start = token_start->next->next->next;
+						Lexer::Token* temp_end = token_start->next->next->next;
+						while (true) {
+							temp_end = temp_end->next;
+							if (temp_end->type == Lexer::BREAK) {
+								std::cerr << "Parser: Unexpected end at ln:" << temp_end->ln << " col:" << temp_end->col;
+								exit(1);
+							}
+							else if (temp_end->text == ")") {
+								params->push_back(parseExpression(temp_start, temp_end));
+								break;
+							}
+							else if (temp_end->type == Lexer::DELIMITER) {
+								params->push_back(parseExpression(temp_start, temp_end));
+								temp_start = temp_end;
+							}
+						}
+
+						//now, we make a codeBlock that is the acutal body of the function
+						args = new list<Ast::Exp*>;
+						Ast::Exp* body = Ast::makeCodeBlock(args, token_start->next->ln, token_start->next->col);
+						Ast::Exp* functionBlock = Ast::makeFunction(label,args,body, token_start->next->ln, token_start->next->col);
+						fun_registry->registerFunction(label, functionBlock);
+						currentCodeBlock = body;
+					}
+					else {
+						std::cerr << "Parser: Invalid syntax at ln:" << token_start->next->next->next->ln << "col:" << token_start->next->next->next->col;
+						exit(1);
+					}
+
 				}
 				else{
 					//This should theoretically never be called
@@ -214,9 +251,18 @@ Ast::Exp* Parser::parseExpression(Lexer::Token* token_start, Lexer::Token* token
 	}
 
 	if (expType == Ast::BINARY) {
-		Ast::Exp* result = Ast::makeBinaryExp(
-			pivot->opType, parseExpression(token_start, pivot), parseExpression(pivot, token_end),
-			pivot->ln, pivot->col);
+		Ast::Exp* result;
+		if (pivot->opType == OpType::FUN_CALL) {
+			 result = Ast::makeCallExp(
+				parseExpression(token_start,pivot), parseDelimitedExpressions(pivot,token_end),
+				pivot->ln, pivot->col);
+		}
+		else {
+			result = Ast::makeBinaryExp(
+				pivot->opType, parseExpression(token_start, pivot), parseExpression(pivot, token_end),
+				pivot->ln, pivot->col);
+		}
+
 		return result;
 	}
 
@@ -272,6 +318,25 @@ Ast::Exp* Parser::parseExpression(Lexer::Token* token_start, Lexer::Token* token
 	//This should only be called if the Expression length is 0; 
 	//Always keep this line checked. 
 	return nullptr;
+}
+
+std::list<Ast::Exp*>* Parser::parseDelimitedExpressions(Lexer::Token * token_start, Lexer::Token * token_end)
+{
+	std::list<Ast::Exp*>* params = new list<Ast::Exp*>;
+	Lexer::Token* temp_start = token_start;
+	Lexer::Token* temp_end = token_start;
+	while (true) {
+		temp_end = temp_end->next;
+		if (temp_end == token_end){
+			params->push_back(parseExpression(temp_start, temp_end));
+			break;
+		}
+		else if (temp_end->type == Lexer::DELIMITER) {
+			params->push_back(parseExpression(temp_start, temp_end));
+			temp_start = temp_end;
+		}
+	}
+	return params;
 }
 
 

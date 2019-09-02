@@ -130,15 +130,15 @@ Ast::Exp * Ast::makeBinaryExp(int opType, Exp * l, Exp * r, int ln, int col)
 	return e;
 }
 
-Ast::Exp * Ast::makeCallExp(string name, list<Exp*>* args, int ln, int col)
+Ast::Exp * Ast::makeCallExp(Ast::Exp* label, list<Exp*>* args, int ln, int col)
 {
 	Exp *e = new Exp;
 	e->expType = CALL;
 	e->opType = NULL;
 	e->parent = nullptr;
-	e->left = nullptr;
+	e->left = label;
 	e->right = nullptr;
-	e->str_attr = name;
+	e->str_attr = "";
 	e->double_attr = NULL;
 	e->int_attr = NULL;
 	e->arguments = args;
@@ -246,6 +246,25 @@ Ast::Exp * Ast::makeInstruction(int instruction, int ln, int col)
 	return e;
 }
 
+Ast::Exp * Ast::makeFunction(std::string label, list<Exp*>* params, Ast::Exp* codeBlock, int ln, int col)
+{	
+	Exp* e = new Exp;
+	e->expType = FUNCTION;
+	e->opType = NULL;
+	e->parent = nullptr;
+	e->left = codeBlock;
+	e->right = nullptr;
+	e->str_attr = label;
+	e->double_attr = NULL;
+	e->int_attr = NULL;
+	e->is_str_attr = true;
+	e->arguments = params;
+	e->ln = ln;
+	e->col = col;
+	return e;
+}
+
+
 int Ast::getCodeBlockType(Lexer::Token* token)
 {
 	//Note, when adding a keyword, this method and isCodeBlock method
@@ -264,6 +283,9 @@ int Ast::getCodeBlockType(Lexer::Token* token)
 		}
 		else if (token->text == "if") {
 			return IF;
+		}
+		else if (token->text == "fun") {
+			return FUNCTION;
 		}
 		else if (token->text == "end") {
 			return -999;

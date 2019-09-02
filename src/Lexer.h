@@ -33,7 +33,8 @@ public:
 		OPERATOR,
 		GROUPER_1,
 		GROUPER_2,
-		BREAK
+		BREAK,
+		DELIMITER,
 	};
 
 	const std::vector<string> keyword_list = {
@@ -46,6 +47,7 @@ public:
 		"elseif",
 		"end",
 		"print"
+		"fun"
 	};
 
 	Lexer();
@@ -66,6 +68,8 @@ private:
 	bool isOperator(string buffer);
 	bool isGrouper_1(string buffer);
 	bool isGrouper_2(string buffer);
+	bool isdelimiter(string buffer);
+
 	bool checkNewLine(char c);
 	void makeToken(list<Token*>* object, string buffer, int type);
 

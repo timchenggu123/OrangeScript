@@ -5,6 +5,7 @@
 #include "Ast.h"
 #include "Variable.h"
 #include "Registry.h"
+#include "FunRegistry.h"
 class Interpreter
 {
 public:
@@ -15,7 +16,7 @@ public:
 		BREAK,
 		CONTINUE
 	};
-	void execute(Ast::Exp* root);
+	void execute(Ast::Exp* root, FunRegistry* fun_registry);
 	static int getInstructionType(std::string label);
 private:
 	void post_order_walk(Ast::Exp* node);
@@ -23,6 +24,8 @@ private:
 	void code_block_walk(Ast::Exp* node);
 	int execute_args(Ast::Exp * node);
 	Registry* _registry;
+	FunRegistry* _fun_registry;
+
 	; //gpt stands for Pointer Loop Up Table. 
 };
 
