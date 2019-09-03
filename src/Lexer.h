@@ -46,7 +46,7 @@ public:
 		"else",
 		"elseif",
 		"end",
-		"print"
+		"print",
 		"fun"
 	};
 

@@ -132,7 +132,7 @@ void Registry::addToCache(std::string label, Variable * variable)
 	if (LUT_cache_precedence->size() > 0) {
 		std::map<std::string, int>::iterator it;
 		std::string replace;
-		int max_precedence;
+		int max_precedence = -1;
 
 		for (it = LUT_cache_precedence->begin(); it != LUT_cache_precedence->end(); it++) {
 			if (it->second > max_precedence) {

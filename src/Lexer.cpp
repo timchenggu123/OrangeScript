@@ -144,12 +144,12 @@ list<Lexer::Token*>* Lexer::run(string inputText) {
 				buffer = "";
 			}
 			else if (isGrouper_1(buffer)) {
-				makeToken(returnObject, buffer, Tokens::GROUPER_1);
 				if (buffer == "(" &&
 					returnObject->back()->type == Tokens::VARIABLE)
 				{
 					makeToken(returnObject, "_call", Tokens::OPERATOR);
 				}
+				makeToken(returnObject, buffer, Tokens::GROUPER_1);
 				buffer = "";
 				ignore_nl = true;
 			}

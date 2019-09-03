@@ -39,6 +39,7 @@ void Parser::parse(list<Lexer::Token*> *tokens, Ast* ast, FunRegistry* fun_regis
 	int codeBlockType = Ast::getCodeBlockType(token); // we take a peek at the first token to determine the code block type.
 	Ast::Exp* currentCodeBlock = rootNode;
 	bool f_is_end = false;
+	bool is_function_body_block;
 
 	while (token != nullptr) 
 	{
@@ -55,7 +56,12 @@ void Parser::parse(list<Lexer::Token*> *tokens, Ast* ast, FunRegistry* fun_regis
 			if (codeBlockType == -999) {
 				//-999 is the return value for the end keyword.
 				//we pop off the stack.
-				parseStack.back()->arguments->push_back(currentCodeBlock);
+				if (is_function_body_block) {
+					is_function_body_block = false;	
+				}
+				else {
+					parseStack.back()->arguments->push_back(currentCodeBlock);
+				}
 				currentCodeBlock = parseStack.back();
 				parseStack.pop_back();
 			}
@@ -94,9 +100,11 @@ void Parser::parse(list<Lexer::Token*> *tokens, Ast* ast, FunRegistry* fun_regis
 					std::string label = token_start->next->next->text;
 
 					//fist, we parse a list of parameters
-					if (token_start->next->next->next->text == "(") { // next->next->next corresponds to keyword -> label -> left parenthesis
-						Lexer::Token* temp_start = token_start->next->next->next;
-						Lexer::Token* temp_end = token_start->next->next->next;
+					//*Note, the lexer will automatically insert a _call operator here. Since we are not doing a call operation,
+					//we can simply ignore that
+					if (token_start->next->next->next->next->text == "(") { // next->next->next->next corresponds to keyword -> label -> _call operator-> left parenthesis
+						Lexer::Token* temp_start = token_start->next->next->next->next;
+						Lexer::Token* temp_end = token_start->next->next->next->next;
 						while (true) {
 							temp_end = temp_end->next;
 							if (temp_end->type == Lexer::BREAK) {
@@ -116,9 +124,10 @@ void Parser::parse(list<Lexer::Token*> *tokens, Ast* ast, FunRegistry* fun_regis
 						//now, we make a codeBlock that is the acutal body of the function
 						args = new list<Ast::Exp*>;
 						Ast::Exp* body = Ast::makeCodeBlock(args, token_start->next->ln, token_start->next->col);
-						Ast::Exp* functionBlock = Ast::makeFunction(label,args,body, token_start->next->ln, token_start->next->col);
+						Ast::Exp* functionBlock = Ast::makeFunction(label,params,body, token_start->next->ln, token_start->next->col);
 						fun_registry->registerFunction(label, functionBlock);
 						currentCodeBlock = body;
+						is_function_body_block = true;
 					}
 					else {
 						std::cerr << "Parser: Invalid syntax at ln:" << token_start->next->next->next->ln << "col:" << token_start->next->next->next->col;
@@ -194,7 +203,9 @@ Ast::Exp* Parser::parseExpression(Lexer::Token* token_start, Lexer::Token* token
 		if (keyword == "print") {
 			std::list<Ast::Exp*>* args = new std::list<Ast::Exp*>();
 			args->push_back(parseExpression(token_start->next, token_end));
-			return Ast::makeCallExp("_print", args, token->next->ln, token->next->col);
+			return Ast::makeCallExp(Ast::makeVariableExp("_print", token->next->ln, token->next->col),
+				args, token->next->ln, token->next->col
+			);
 		}
 	}
 

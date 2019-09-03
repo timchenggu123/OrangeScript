@@ -302,6 +302,7 @@ bool Ast::isCodeBlock(Exp * e)
 	case WHILE:
 	case IF:
 	case CODE_BLK:
+	case FUNCTION:
 		return true;
 	}
 

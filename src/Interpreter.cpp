@@ -33,7 +33,6 @@ int Interpreter::getInstructionType(std::string label)
 
 void Interpreter::post_order_walk(Ast::Exp * node)
 {
-
 	if (Ast::isCodeBlock(node)) {
 		 code_block_walk(node);
 	}
@@ -50,11 +49,16 @@ void Interpreter::post_order_walk(Ast::Exp * node)
 		post_order_walk(node->left);
 		interpret_node(node);
 	}
+	else if (node->expType == Ast::CALL) {
+		post_order_walk(node->left);
+		interpret_node(node);
+	}
 }
 
 void Interpreter::interpret_node(Ast::Exp * node)
 {
 	//TODO:Complete this
+
 	switch (node->expType) {
 		case Ast::BINARY: {
 
@@ -676,7 +680,6 @@ void Interpreter::interpret_node(Ast::Exp * node)
 							
 							Variable* x = new Integer(node->right->int_return, node->str_attr);
 							_registry->registerVariable(node->left->str_attr, x);
-							int abc = 1;
 
 						}
 						else if (node->right->is_str_return) {
@@ -685,7 +688,6 @@ void Interpreter::interpret_node(Ast::Exp * node)
 						}
 						else if (node->right->is_symbolic_return) {
 							//TODO: complete symbolic assignment that is not of the 3 basic types. 
-							int a = 1; //just so I have something to set a break point on.
 						}
 
 					}
@@ -750,7 +752,7 @@ void Interpreter::interpret_node(Ast::Exp * node)
 		case Ast::CALL: {
 			//TODO: modify this. Only supports print right now for testing purposes
 
-			if (node->str_attr == "_print") {
+			if (node->left->str_attr == "_print") {
 				Ast::Exp* arg = node->arguments->back();
 				post_order_walk(arg);
 				if (arg->is_int_return) {
@@ -972,14 +974,13 @@ void Interpreter::runFunction(Ast::Exp * function, Ast::Exp * node)
 {
 	//we temporarily save the current registry and initialize a new independent registry 
 	//for the function
-	Registry* temp = _registry;
-	_registry = new Registry();
-	_registry->new_child_scope();
+	Registry* exclusive_registry = new Registry();
+	exclusive_registry->new_child_scope();
 
 	//Declaring and initializing parameters
 	std::list<Ast::Exp*>::iterator it1 = function->arguments->begin();
 	std::list<Ast::Exp*>::iterator it2 = node->arguments->begin();
-	for (; it1 != function->arguments->end() && it2 != function->arguments->end(); it1++, it2++) {
+	for (; it1 != function->arguments->end() && it2 != node->arguments->end(); it1++, it2++) {
 		Ast::Exp* param = *it1;
 		Ast::Exp* val = *it2;
 		post_order_walk(val);
@@ -987,26 +988,31 @@ void Interpreter::runFunction(Ast::Exp * function, Ast::Exp * node)
 
 		if (val->is_double_return) {
 			Variable* x = new Decimal(val->double_return, param->str_attr);
-			_registry->registerVariable(param->str_attr, x);
+			exclusive_registry->registerVariable(param->str_attr, x);
 
 		}
 		else if (val->is_int_return) {
 
 			Variable* x = new Integer(val->int_return, param->str_attr);
-			_registry->registerVariable(param->str_attr, x);
-			int abc = 1;
+			exclusive_registry->registerVariable(param->str_attr, x);
+
 
 		}
 		else if (val->is_str_return) {
 			Variable* x = new String(val->str_return, param->str_attr);
-			_registry->registerVariable(param->str_attr, x);
+			exclusive_registry->registerVariable(param->str_attr, x);
 		}
 		else if (val->is_symbolic_return) {
 			//TODO: complete symbolic assignment that is not of the 3 basic types. 
 		}
 
+
 	}
 
+	Registry* temp = _registry;
+	_registry = exclusive_registry;
+	exclusive_registry = nullptr;
+	
 	//the codeBlock containing the function body is stored in the left
 	execute_args(function->left);
 

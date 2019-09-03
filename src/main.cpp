@@ -7,7 +7,7 @@
 #include "Ast.h"
 #include "Parser.h"
 #include "Interpreter.h"
-
+#include "FunRegistry.h""
 using std::string;
 using std::cout;
 using std::cin;
@@ -43,9 +43,10 @@ int main (int argc, char *argv[]){
 	
 	Ast* ast = new Ast();
 	Parser* parser = new Parser();
-	parser->parse(tokenList, ast);
+	FunRegistry* fun_registry = new FunRegistry();
+	parser->parse(tokenList, ast,fun_registry);
 	Interpreter* itrprtr = new Interpreter();
-	itrprtr->execute(ast->getRoot());
+	itrprtr->execute(ast->getRoot(),fun_registry);
 
 	system("pause");
     return 0;
