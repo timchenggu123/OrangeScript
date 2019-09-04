@@ -183,7 +183,7 @@ Ast::Exp* Parser::parseExpression(Lexer::Token* token_start, Lexer::Token* token
 
 	vector<Lexer::Token*> brkt_stk;
 
-	Lexer::Token* pivot;
+	Lexer::Token* pivot = nullptr;
 
 	//Check to see if the expression is enclosed by brackets. If so, skip
 	if (token_start->next->text == "(" &&

@@ -14,6 +14,7 @@ using std::cin;
 using std::endl;
 using std::ifstream;
 using std::stringstream;
+
 int main (int argc, char *argv[]){
 
 	if (argc == 0) {

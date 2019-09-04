@@ -1,5 +1,8 @@
+fun beep (input)
+	print input + 1
+end
 a =0
 for (5) 
 	a = a + 1
-	print a
+	beep(a)
 end
