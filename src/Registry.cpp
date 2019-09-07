@@ -1,9 +1,9 @@
 #include "Registry.h"
 
 Registry::Registry() :
-	LUT_stack(new std::list < std::map<std::string, Variable*>*>),
-	LUT_cache(new std::map<std::string, Variable*>()),
-	LUT_cache_precedence(new std::map<std::string, int>())
+	LUT_stack(new std::list < std::unordered_map<std::string, Variable*>*>),
+	LUT_cache(new std::unordered_map<std::string, Variable*>()),
+	LUT_cache_precedence(new std::unordered_map<std::string, int>())
 {
 
 }
@@ -19,17 +19,17 @@ Registry::~Registry()
 
 void Registry::new_child_scope()
 {
-	LUT_stack->push_back(new std::map<std::string, Variable*>);
+	LUT_stack->push_back(new std::unordered_map<std::string, Variable*>);
 
 }
 
 void Registry::destroy_child_scope()
 {
-	std::map<std::string, Variable*>* child = LUT_stack->back();
+	std::unordered_map<std::string, Variable*>* child = LUT_stack->back();
 	LUT_stack->pop_back();
 
 	if (LUT_cache->size() != 0) {
-		std::map<std::string, Variable*>::iterator it;
+		std::unordered_map<std::string, Variable*>::iterator it;
 		std::list<std::string>* list_to_delete = new std::list<string>;
 		for (it = LUT_cache->begin(); it != LUT_cache->end(); it++) {
 			//we loop through cache and check to see if it exists in child
@@ -50,7 +50,7 @@ void Registry::destroy_child_scope()
 
 	//we now delete the variable pointers in the actual map
 	if (child->size() != 0) {
-		std::map<std::string, Variable*>::iterator it;
+		std::unordered_map<std::string, Variable*>::iterator it;
 		for (it = child->begin(); it != child->end(); it++)
 		{
 			delete it->second;
@@ -69,9 +69,9 @@ Variable* Registry::getVariable(std::string label)
 		return cache_result;
 	}
 	else {
-		std::list < std::map<std::string, Variable*>*>::iterator it;
+		std::list < std::unordered_map<std::string, Variable*>*>::iterator it;
 		for (it = LUT_stack->begin(); it != LUT_stack->end(); it++) {
-			std::map<std::string, Variable*>* map = *it;
+			std::unordered_map<std::string, Variable*>* map = *it;
 			if (map->count(label) != 0) {
 				addToCache(label, map->find(label)->second);
 				return map->find(label)->second;
@@ -95,7 +95,7 @@ bool Registry::registerVariable(std::string label, Variable * variable)
 	if (exist != nullptr) {
 		delete exist;
 	}
-	std::map<std::string, Variable*>* current_scope = LUT_stack->back();
+	std::unordered_map<std::string, Variable*>* current_scope = LUT_stack->back();
 	current_scope->insert(std::pair < std::string, Variable*>(label, variable));
 	addToCache(label, variable);
 		
@@ -113,7 +113,7 @@ Variable* Registry::searchCache(std::string label)
 		//we update the cache access precedence
 		if (*precedence != 1) {
 			*precedence = 1;
-			std::map<std::string, int>::iterator it;
+			std::unordered_map<std::string, int>::iterator it;
 			for (it = LUT_cache_precedence->begin(); it != LUT_cache_precedence->end(); it++) {
 				it->second++;
 			}
@@ -130,7 +130,7 @@ Variable* Registry::searchCache(std::string label)
 void Registry::addToCache(std::string label, Variable * variable)
 {
 	if (LUT_cache_precedence->size() > 0) {
-		std::map<std::string, int>::iterator it;
+		std::unordered_map<std::string, int>::iterator it;
 		std::string replace;
 		int max_precedence = -1;
 
@@ -156,7 +156,7 @@ void Registry::addToCache(std::string label, Variable * variable)
 
 void Registry::clearCache()
 {
-	std::map<std::string, Variable*>::iterator it;
+	std::unordered_map<std::string, Variable*>::iterator it;
 	for (it = LUT_cache->begin(); it != LUT_cache->end(); it++) {
 		delete it->second;
 		it->second = nullptr;

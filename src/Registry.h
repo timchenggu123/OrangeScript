@@ -2,7 +2,7 @@
 #define REGISTRY_H
 
 
-#include <map>
+#include <unordered_map>
 #include <string>
 #include <List>
 #include "Variable.h"
@@ -21,9 +21,9 @@ public:
 	void clearCache();
 private:
 	int cache_size = 20; //this is fairly aribitrary, may need to change it.
-	std::list < std::map<std::string, Variable*>*> *LUT_stack;
-	std::map<std::string, Variable*> *LUT_cache;
-	std::map<std::string, int> *LUT_cache_precedence;
+	std::list < std::unordered_map<std::string, Variable*>*> *LUT_stack;
+	std::unordered_map<std::string, Variable*> *LUT_cache;
+	std::unordered_map<std::string, int> *LUT_cache_precedence;
 
 
 };
