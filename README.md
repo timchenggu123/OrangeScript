@@ -1,5 +1,5 @@
 <p align = "center">
-<img src = logo/logo.PNG height = "300px" alt = "OrangeScript" title = "OrangeScript">
+<img src = logo/OrangeScript.png height = "180px" alt = "OrangeScript" title = "OrangeScript">
 </p>
 
 An imperative, dynamically typed, interpreting programming language written in C++
