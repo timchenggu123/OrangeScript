@@ -61,7 +61,7 @@ public:
 	static Exp* makeIntegerExp(int i, int ln, int col);
 	static Exp* makeDecimalExp(string s, int ln, int col);
 	static Exp* makeStringExp(string s, int ln, int col);
-	static Exp* makeVariableExp(string s, int ln, int col);
+	static Exp* makeAbstractDataTypeExp(string s, int ln, int col);
 	static Exp* makeUnaryExp(int opType, Exp* l, int ln, int col);
 	static Exp* makeBinaryExp(int opType, Exp* l, Exp* r, int ln, int col);
 	static Exp* makeCallExp(Ast::Exp* label, list<Exp*>* args, int ln, int col);

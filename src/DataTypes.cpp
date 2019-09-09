@@ -1,25 +1,25 @@
-#include "Variable.h"
+#include "DataTypes.h"
 
-void Variable::_setLabel(std::string label)
+void AbstractDataType::_setLabel(std::string label)
 {
 	_label = label;
 }
 
-Variable::~Variable()
+AbstractDataType::~AbstractDataType()
 {
 }
 
-bool Variable::_getBoolVal()
+bool AbstractDataType::_getBoolVal()
 {
 	return _bool_val;
 }
 
-int Variable::_getBinVal()
+int AbstractDataType::_getBinVal()
 {
 	return _bin_val;
 }
 
-int Variable::_getType()
+int AbstractDataType::_getType()
 {
 	return _dataType;
 }
@@ -61,7 +61,7 @@ void Integer::_setDataType()
 
 String::String(std::string val, std::string label) :
 	_val(val),
-	_is_char(val.length() == 1 ? true: false)
+	_is_char(val.length() == 1 ? true : false)
 {
 	_setLabel(label);
 	_setBoolVal();

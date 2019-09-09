@@ -120,6 +120,7 @@
     <ClInclude Include="..\src\FunRegistry.h" />
     <ClInclude Include="..\src\Interpreter.h" />
     <ClInclude Include="..\src\Lexer.h" />
+    <ClInclude Include="..\src\LRU_Cache.h" />
     <ClInclude Include="..\src\OpType.h" />
     <ClInclude Include="..\src\Parser.h" />
     <ClInclude Include="..\src\Registry.h" />

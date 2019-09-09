@@ -3,24 +3,24 @@
 
 #include <string>
 #include "Ast.h"
-class Variable {
+
+class AbstractDataType {
 public:
-	virtual ~Variable();
+	virtual ~AbstractDataType();
 	bool _getBoolVal();
 	int _getBinVal();
 	int _getType();
-	
+
 protected:
-	std::string _label;
 	int _dataType = Ast::NULL_TYPE;
 	bool _bool_val = false;
+	bool _valid = true;
 	int _bin_val = 0;
-	void _setLabel(std::string label);
 };
 
-class Integer: public Variable{
+class Integer : public AbstractDataType {
 public:
-	Integer(int val, std::string label);
+	Integer(int val);
 	int getVal();
 	void setVal(int val);
 protected:
@@ -31,9 +31,9 @@ protected:
 
 };
 
-class String : public Variable {
+class String : public AbstractDataType {
 public:
-	String(std::string val, std::string label);
+	String(std::string val);
 	std::string getVal();
 	void setVal(std::string val);
 protected:
@@ -46,9 +46,9 @@ protected:
 	void _setDataType();
 };
 
-class Decimal : public Variable {
+class Decimal : public AbstractDataType {
 public:
-	Decimal(double val, std::string label);
+	Decimal(double val);
 	double getVal();
 	void setVal(double val);
 protected:
